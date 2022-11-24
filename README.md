@@ -13,7 +13,7 @@ This Repositorie contains my solution to the project `ft_irc` of 42 (Paris).
 ## Cloning
 
 ```shell
-git clone --recurse-submodules https://github.com/Freya-Tenebrae/Irc.git
+git clone --recurse-submodules https://github.com/Freya-Tenebrae/ft_irc.git
 ```
 
 ## Compilation
