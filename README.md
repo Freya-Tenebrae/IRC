@@ -60,9 +60,6 @@ make
 #### que l'on peut faire maintenant :
 - finir ping.cpp (au niveau du pong reply)
 - finir pong.cpp (et mettre a jour les donnees)
-- faire who.cpp
-- faire whois.cpp
-- faire whowas.cpp
 
 #### complexe :
 - faire quit.cpp
