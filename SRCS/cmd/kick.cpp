@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/22 16:23:19 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/17 18:46:59 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ std::vector<Reply>	Server::kick(User *user, std::vector<std::string> args)
 	std::vector<Reply> reply;
 	(void)user;
 	(void)args;
+
+	// only channel orperator can do this command
 	
 	return (reply);
 }

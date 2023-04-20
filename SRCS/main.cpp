@@ -6,7 +6,7 @@
 /*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 18:26:22 by mmercore          #+#    #+#             */
-/*   Updated: 2023/03/30 18:20:48 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/04/17 19:33:46 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,22 +67,27 @@
 //     shutdown(server_fd, SHUT_RDWR);
 //     return 0;
 // }
+#define restart 1
 
 int	main(int ac, char **av, char **envp) {
 	(void)ac, (void)av, (void)envp;
-	if (ac == 1)
+
+	while (restart)
 	{
-		Server a;
+		if (ac == 1)
+		{
+			Server a;
+		}
+		if (ac == 2)
+		{
+			Server a(atoi(av[1]));
+		}
+		if (ac == 3)
+		{
+			Server a(atoi(av[1]), av[2]);
+		}		
 	}
-	if (ac == 2)
-	{
-		Server a(atoi(av[1]));
-	}
-	if (ac == 3)
-	{
-		Server a(atoi(av[1]), av[2]);
-	}
-	//PRINT "The errval is " << a.errval << " and the errno is " << strerror(errno) ENDL;
+
 	
 	//while(1);
 	// struct pollfd	fds[1];

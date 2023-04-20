@@ -6,7 +6,7 @@
 /*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/30 19:20:57 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/04/17 18:56:20 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,10 @@ typedef enum e_serv_error {
 	poll_fail,
 	timeout,
 	accept_fail,
-	recv_fail
+	recv_fail,
+	server_close,
+	server_restart,
+	user_close
 }							t_serv_error;
 
 // 		Domain:
@@ -158,7 +161,7 @@ class Server {
 		int							_port;
 		int							_socketfd;
 		std::vector<User *>			_usr_list;
-		// std::vector<Channel *>		_cha_list;
+		std::vector<Channel *>		_cha_list;
 		std::vector<std::string>	_modt;
 		std::vector<std::string>	_info;
 

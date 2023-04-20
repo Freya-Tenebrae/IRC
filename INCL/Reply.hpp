@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 17:32:30 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/30 18:52:43 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/17 18:41:45 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef REPLY_HPP
@@ -41,7 +41,6 @@ class Reply
 
 };
 
-#define NO_REPLY Reply(0, "")
 #define RPL_WELCOME Reply(001, "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]\n")
 #define RPL_YOURHOST Reply(002, "<client> :Your host is <servername>, running version <version>\n")
 #define RPL_CREATED Reply(003, "<client> :This server was created <datetime>\n")
@@ -72,7 +71,7 @@ class Reply
 #define RPL_LOCALUSERS Reply(265, "<client> [<u> <m>] :Current local users <u>, max <m>\n")
 #define RPL_GLOBALUSERS Reply(266, "<client> [<u> <m>] :Current global users <u>, max <m>\n")
 #define RPL_WHOISCERTFP Reply(276, "<nick> <client>:has client certificate fingerprint <fingerprint>\n")
-#define RPL_NONE Reply(300, "\n")
+#define RPL_NONE Reply(300, "")
 #define RPL_AWAY Reply(301, "<client> <nick> :<message>\n")
 #define RPL_USERHOST Reply(302, "<client> :[<reply>{ <reply>}]\n")
 #define RPL_UNAWAY Reply(305, "<client> :You are no longer marked as being away\n")
@@ -131,10 +130,10 @@ class Reply
 #define ERR_TOOMANYCHANNELS Reply(405, "<client> <channel> :You have joined too many channels\n")
 #define ERR_WASNOSUCHNICK Reply(406, "<client> :There was no such nickname\n")
 #define ERR_NOORIGIN Reply(409, "<client> :No origin specified\n")
-#define ERR_NORECIPIENT Reply(411, "\n")
-#define ERR_NOTEXTTOSEND Reply(412, "\n")
-#define ERR_NOTOPLEVEL Reply(413, "\n")
-#define ERR_WILDTOPLEVEL Reply(414, "\n")
+#define ERR_NORECIPIENT Reply(411, "<client> :No recipient given (<command>)\n")
+#define ERR_NOTEXTTOSEND Reply(412, "<client> :No text to send\n")
+#define ERR_NOTOPLEVEL Reply(413, "<client> <mask> :No toplevel domain specified\n")
+#define ERR_WILDTOPLEVEL Reply(414, "<client> <mask> :Wildcard in toplevel domain\n")
 #define ERR_INPUTTOOLONG Reply(417, "<client> :Input line was too long\n")
 #define ERR_UNKNOWNCOMMAND Reply(421, "<client> <command> :Unknown command\n")
 #define ERR_NOMOTD Reply(422, "<client> :MOTD File is missing\n")

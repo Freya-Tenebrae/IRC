@@ -6,7 +6,7 @@
 /*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/03/30 19:24:33 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/04/17 19:57:43 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,10 @@ str			Server::get_errval(t_serv_error errval) const
 		case timeout:		return("timeout");
 		case accept_fail:	return("accept_fail");
 		case recv_fail:		return("recv_fail");
+		case server_close:	return("server_close");
+		case server_restart:return("server_restart");
+		case user_close:	return("user_close");
+
 	}
 	return ("nothing");
 }
@@ -233,10 +237,11 @@ int		Server::polling_loop()
 	recv_ret = 1;
 	this->fds[0].fd = get_socketfd();
 	this->fds[0].events = POLLIN;
+	this->fds[0].revents = 0;
 	unsigned int fakeaddr = sizeof((this->_address)); 
 	(void)fakeaddr;
 	pol_ret = 0;
-	while(this->errval == 0)
+	while(this->errval == 0 || this->errval == user_close)
 	{
 		PRERR "Polling..." ENDL;
 		//PRINT this->_modt ENDL;
@@ -257,9 +262,9 @@ int		Server::polling_loop()
 		else
 		{
 			fd_cursor = 0;
-			while (fd_cursor <= fd_counter)
+			while (fd_cursor < fd_counter && this->errval != server_close && this->errval != server_restart)
 			{
-				PRERR "revents for fd " << fd_cursor << " out of " << fd_counter << " is " << fds[fd_cursor].revents ENDL
+				PRERR "revents for fd " << fd_cursor << " out of " << fd_counter << " is " ENDL
 				if (fds[fd_cursor].revents == 0)
 				{
 					PRERR "Doin a skippy on fd " << fd_cursor << " out of " << fd_counter ENDL
@@ -282,9 +287,10 @@ int		Server::polling_loop()
 						{
 							fds[fd_counter].fd = new_fd;
 							fds[fd_counter].events = POLLIN;
+							fds[fd_counter].revents = 0;
 							PRERR "\033[31mNEW CONNECTION HIHI\033[0m" ENDL;
 							//send(fds[fd_counter].fd, this->_motd.c_str(), this->motd, 0);
-							PRERR "\033[31mNew fd is now \033[0m" << new_fd ENDL
+							PRERR "\033[31mNew fd is now \033[0m" << new_fd << "e are at " << fd_cursor << " Out of " << fd_counter ENDL
 
 							User	*u = new User(fds[fd_counter].fd);
 							u->set_hostname("localhost");
@@ -311,22 +317,29 @@ int		Server::polling_loop()
 						if (recv_ret <= 0)
 						{
 							// erreurs & close
-							if (errno != EWOULDBLOCK || recv_ret == 0)
+							if (errno != EWOULDBLOCK || recv_ret == 0 || this->errval == server_close || this->errval == server_restart || this->errval == user_close)
 							{
-								//this->errval = recv_fail;
 								close(fds[fd_cursor].fd);
-								fds[fd_cursor].fd = -1;
-								fds[fd_cursor].events = 0;
+								//this->errval = recv_fail;
 								PRERR "ERREURS ET CLOSE" ENDL
 								for (std::vector<User *>::iterator it = _usr_list.begin(); it != _usr_list.end(); it++)
 								{
+									// std::cerr << (*it)->get_fd() << " --- " << fds[fd_cursor].fd << std::endl;
 									if ((*it)->get_fd() == fds[fd_cursor].fd)
 									{
 										User * usr = *it;
 										_usr_list.erase(it);
 										delete usr;
+										break;
 									}
 								}
+								if (this->errval == user_close)
+								{
+									PRERR "Successfully closed user " << fd_cursor << " With fd " << fds[fd_cursor].fd ENDL;
+									this->errval = nothing;
+								}
+								fds[fd_cursor].fd = -1;
+								fds[fd_cursor].events = 0;
 								// CELIA PAR ICI (cf discord)
 								int i = fd_cursor;
 								while (i < fd_counter)
@@ -338,6 +351,7 @@ int		Server::polling_loop()
 								fds[i].events = 0;
 								fd_counter--;
 								fd_cursor--;
+
 							}
 							break;
 						}
@@ -360,10 +374,42 @@ int		Server::polling_loop()
 							// Errors	
 						}
 					} while (compilecommand(buffer, fds[fd_cursor].fd));
-
+					this->fds[fd_cursor].revents = 0;
 				}
 				fd_cursor++;
 			}
+		}
+	}
+	if (this->errval == server_close || this->errval == server_restart)
+	{
+		fd_cursor = 1;
+		while (fd_cursor < fd_counter)
+		{
+			close(fds[fd_cursor].fd);
+			PRERR "ERREURS ET CLOSE" ENDL
+			for (std::vector<User *>::iterator it = _usr_list.begin(); it != _usr_list.end(); it++)
+			{
+				// std::cerr << (*it)->get_fd() << " --- " << fds[fd_cursor].fd << std::endl;
+				if ((*it)->get_fd() == fds[fd_cursor].fd)
+				{
+					User * usr = *it;
+					_usr_list.erase(it);
+					delete usr;
+					break;
+				}
+			}
+			fds[fd_cursor].fd = -1;
+			fds[fd_cursor].events = 0;
+			// CELIA PAR ICI (cf discord)
+			int i = fd_cursor;
+			while (i < fd_counter)
+			{
+				fds[i] = fds[i + 1];
+				i++;
+			}
+			fds[i].fd = 0;
+			fds[i].events = 0;
+			fd_counter--;
 		}
 	}
 	return (0);
@@ -374,8 +420,20 @@ int		Server::compilecommand(char *message, int fd)
 	static str m;
 
 	m.append(message);
+	if (m.find("EVACWINCHESTER") != str::npos)
+	{
+		this->errval = server_restart;
+		m.clear();
+		return (0);
+	}
+	if (m.find("CLOSEME") != str::npos)
+	{
+		this->errval = user_close;
+		m.clear();
+		return (0);
+	}
 	PRERR "Message size  " << m ENDL;
-	if (m.find(CRLF) != str::npos)
+	if (m.find(CRLF) != str::npos && m.length() > 3)
 	{
 		PRERR "Correct message, going for the parse" ENDL;
 		run_buffer(fd, m.c_str());

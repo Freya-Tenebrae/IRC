@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/30 16:07:30 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/17 18:47:53 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ std::vector<Reply>	Server::topic(User *user, std::vector<std::string> args)
 	std::vector<Reply> reply;
 	(void)user;
 	(void)args;
+
+	// only channel orperator can change the topic of a channel
 	
 	return (reply);
 }

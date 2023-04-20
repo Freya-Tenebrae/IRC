@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/22 16:23:35 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/17 18:43:51 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ std::vector<Reply>	Server::pass(User *user, std::vector<std::string> args)
 	else
 	{
 		user->set_connected();
-		reply.push_back(NO_REPLY);
+		reply.push_back(RPL_NONE);
 	}
 	reply[0].add_user(user);
 	reply[0].prep_to_send(1);

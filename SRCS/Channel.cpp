@@ -6,32 +6,166 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:37:57 by plam              #+#    #+#             */
-/*   Updated: 2023/02/27 19:16:13 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/17 19:33:00 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../INCL/Channel.hpp"
 
-Channel::Channel() { }
-Channel::Channel(const Channel &other) {
-	*this = other;
+Channel::Channel():_name(""), _number_max_user(-1)
+{
+	// do not use this;
 }
 
-Channel::~Channel() { }			// `a voir comment supprimer les différents éléments de la classe channel
+Channel::Channel(std::string	name):_name(name), _number_max_user(-1)
+{
 
-Channel	&Channel::operator=(const Channel &other) {
-	if (this != &other) {		// PEUT ETRE À ENLEVER (je l'ai juste mis pour que ca compile - MAX)
-		this->_name = other._name;
-	}							//copy function for Channel ?
+}
+
+Channel::Channel(const Channel &other)
+{
+	*this = other;
+	// do not use this;
+}
+
+Channel::~Channel()
+{
+
+}
+
+Channel	&Channel::operator=(const Channel &other)
+{
+	this->_name = other.get_name();
+	this->_number_max_user = other.get_number_max_user();
+
+	std::vector<User *> tmp_usr_list = other.get_ch_usr_list();
+	for (std::vector<User *>::const_iterator it = tmp_usr_list.begin(); it != tmp_usr_list.end(); it++)
+	{
+		this->_ch_usr_list.push_back(*it);
+	}
+
+	std::multimap<char, std::string> tmp_channelmode = other.get_channelmode();
+	for (std::multimap<char, std::string>::const_iterator it = tmp_channelmode.begin(); it != tmp_channelmode.end(); it++)
+	{
+		this->_channelmode.insert(std::pair<char, std::string>(it->first, it->second));
+	}
+
 	return *this;
 }
 
-void	Channel::add(User &user) {
-	(void)user;
-	// use epoll(epfd, EPOLL_CTL_ADD, fd, *event) for this function ?
+const std::string	&Channel::get_name() const
+{
+	return (_name);
 }
 
-void	Channel::del(User &user) {
-	(void)user;
-	// use epoll(epfd, EPOLL_CTL_DEL, fd, *event) for this function ?
+const int	&Channel::get_number_max_user() const
+{
+	return (_number_max_user);
+}
+
+const std::vector<User *>	&Channel::get_ch_usr_list() const
+{
+	return (_ch_usr_list);
+}
+
+const User	*Channel::get_User(int fd) const
+{
+	for (std::vector<User *>::const_iterator it = _ch_usr_list.begin(); it != _ch_usr_list.end(); it++)
+	{
+		if ((*it)->get_fd() == fd)
+			return (*it);
+	}
+	return (NULL);
+}
+
+const std::multimap<char, std::string>	&Channel::get_channelmode() const
+{
+	return (_channelmode);
+}
+
+void	Channel::add_user(User *user)
+{
+	this->_ch_usr_list.push_back(user);
+}
+
+void	Channel::del_user(User *user)
+{
+	for (std::vector<User *>::iterator it = _ch_usr_list.begin(); it != _ch_usr_list.end(); it++)
+	{
+		if (*it == user)
+			_ch_usr_list.erase(it);
+	}
+}
+
+bool	Channel::check_if_simple_mode_is_used(const char mod)
+{
+	for (std::multimap<char, std::string>::iterator it = _channelmode.begin(); it != _channelmode.end(); it++)
+	{
+		if (it->first == mod)
+			return (true);
+	}
+	return (false);
+}
+
+void	Channel::add_simple_channelmode(const char newMod)
+{
+	this->_channelmode.insert(std::pair<char, std::string>(newMod, ""));
+}
+
+void	Channel::del_simple_usermode(const char oldMod)
+{
+	for (std::multimap<char, std::string>::iterator it = _channelmode.begin(); it != _channelmode.end(); it++)
+	{
+		if (it->first == oldMod)
+		{
+			_channelmode.erase(it);
+			break;
+		}
+	}
+}
+
+bool	Channel::check_if_complexe_mode_is_used(const char mod, const std::string mask)
+{
+	for (std::multimap<char, std::string>::iterator it = _channelmode.begin(); it != _channelmode.end(); it++)
+	{
+		if (it->first == mod && it->second.compare(mask) == 0)
+			return (true);
+	}
+	return (false);
+}
+
+void	Channel::add_complex_channelmode(const char newMod, const std::string newmask)
+{
+	this->_channelmode.insert(std::pair<char, std::string>(newMod, newmask));
+}
+
+void	Channel::del_complex_usermode(const char oldMod, const std::string oldmask)
+{
+	for (std::multimap<char, std::string>::iterator it = _channelmode.begin(); it != _channelmode.end(); it++)
+	{
+		if (it->first == oldMod && it->second.compare(oldmask) == 0)
+		{
+			_channelmode.erase(it);
+			break;
+		}
+	}
+}
+
+bool	Channel::check_if_specific_mode_is_used(const char mod)
+{
+	if (mod == 'l' && _number_max_user == -1)
+		return (false);
+	return (true);
+}
+
+void	Channel::add_complex_channelmode(const char newMod, const int n)
+{
+	if (newMod == 'l')
+		_number_max_user = n;
+}
+
+void	Channel::del_complex_usermode(const char oldMod)
+{
+	if (oldMod == 'l')
+		_number_max_user = -1;
 }

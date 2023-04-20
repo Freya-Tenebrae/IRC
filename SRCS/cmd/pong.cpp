@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/28 17:49:56 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/17 18:43:51 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ std::vector<Reply>	Server::pong(User *user, std::vector<std::string> args)
 	else
 	{
 		// update ping/pong value on User.cpp
-		reply.push_back(NO_REPLY);
+		reply.push_back(RPL_NONE);
 	}
 	reply[0].add_user(user);
 	reply[0].add_arg("PONG", "");

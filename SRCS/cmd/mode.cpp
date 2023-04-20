@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/27 17:06:18 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/17 18:48:07 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,7 @@ std::vector<Reply>	Server::mode(User *user, std::vector<std::string> args)
 				else
 				{
 					// if channel
+					// only channel orperator can do this command
 				}
 			}
 			else
