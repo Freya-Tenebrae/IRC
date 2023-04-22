@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   whowas.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:44:05 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/21 15:00:24 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,5 +63,6 @@ std::vector<Reply>	Server::whowas(User *user, std::vector<std::string> args)
 	(void)user;
 	(void)args;
 	
+	reply.push_back(RPL_ENDOFWHOWAS);
 	return (reply);
 }

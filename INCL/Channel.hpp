@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 12:51:43 by plam              #+#    #+#             */
-/*   Updated: 2023/04/17 19:30:51 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/21 19:34:47 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ class Channel
 
 		const std::string						&get_name() const;
 		const int								&get_number_max_user() const;
+		int										get_number_act_user() const;
 		const std::vector<User *>				&get_ch_usr_list() const;
 		const User								*get_User(int fd) const;
 		const std::multimap<char, std::string>	&get_channelmode() const;
@@ -62,7 +63,8 @@ class Channel
 		void						add_simple_channelmode(const char newMod);
 		void						del_simple_usermode(const char oldMod);
 
-		bool						check_if_complexe_mode_is_used(const char mod, const std::string mask);
+		bool						check_if_complexe_mode_is_used(const char mod);
+		bool						check_if_complexe_mode_is_correct(const char mod, const std::string mask);
 		void						add_complex_channelmode(const char newMod, const std::string newmask);
 		void						del_complex_usermode(const char oldMod, const std::string oldmask);
 

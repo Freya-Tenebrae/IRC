@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:37:57 by plam              #+#    #+#             */
-/*   Updated: 2023/04/17 19:33:00 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/21 19:42:10 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,11 @@ const std::string	&Channel::get_name() const
 const int	&Channel::get_number_max_user() const
 {
 	return (_number_max_user);
+}
+
+int	Channel::get_number_act_user() const
+{
+	return (_ch_usr_list.size());
 }
 
 const std::vector<User *>	&Channel::get_ch_usr_list() const
@@ -124,7 +129,17 @@ void	Channel::del_simple_usermode(const char oldMod)
 	}
 }
 
-bool	Channel::check_if_complexe_mode_is_used(const char mod, const std::string mask)
+bool	Channel::check_if_complexe_mode_is_used(const char mod)
+{
+	for (std::multimap<char, std::string>::iterator it = _channelmode.begin(); it != _channelmode.end(); it++)
+	{
+		if (it->first == mod)
+			return (true);
+	}
+	return (false);
+}
+
+bool	Channel::check_if_complexe_mode_is_correct(const char mod, const std::string mask)
 {
 	for (std::multimap<char, std::string>::iterator it = _channelmode.begin(); it != _channelmode.end(); it++)
 	{

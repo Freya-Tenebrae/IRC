@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:56:20 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/04/21 18:52:23 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ class Server {
 		int			compilecommand(char *message, int fd);
 
 		User						*find_user(int fd);
+		Channel						*find_channel(std::string channel_name);
 		void						run_buffer(int fd, std::string buffer);
 		std::vector<std::string>	pars_buffer(std::string &buffer);
 		void						run_line(User *user, std::string &line);
@@ -178,6 +179,7 @@ class Server {
 		std::vector<Reply>			oper(User *user, std::vector<std::string> args);
 		std::vector<Reply>			quit(User *user, std::vector<std::string> args);
 		std::vector<Reply>			join(User *user, std::vector<std::string> args);
+		std::vector<Reply>			try_to_join(User *user, std::string channel_name, std::string channel_key);
 		std::vector<Reply>			part(User *user, std::vector<std::string> args);
 		std::vector<Reply>			topic(User *user, std::vector<std::string> args);
 		std::vector<Reply>			names(User *user, std::vector<std::string> args);

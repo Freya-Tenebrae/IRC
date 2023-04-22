@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/04/17 19:57:43 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/04/21 18:53:05 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -457,6 +457,16 @@ User	*Server::find_user(int fd)
 	return (NULL);
 }
 
+Channel	*Server::find_channel(std::string channel_name)
+{
+	for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
+	{
+		if ((*it)->get_name().compare(channel_name) == 0)
+			return (*it);
+	}
+	return (NULL);
+}
+
 void	Server::run_buffer(int fd, std::string buffer)
 {
 	User *user = find_user(fd);
@@ -473,7 +483,10 @@ void	Server::run_buffer(int fd, std::string buffer)
 		}
 	}
 	for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); it++)
-		run_line(user, *it);
+	{
+		if (it->compare("") != 0)
+			run_line(user, *it);
+	}
 }
 
 std::vector<std::string>	Server::pars_buffer(std::string &buffer)

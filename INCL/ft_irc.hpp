@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_irc.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 18:24:09 by mmercore          #+#    #+#             */
-/*   Updated: 2023/03/30 16:28:37 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/21 16:18:57 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 # include <map>
 # include <string>
 # include <cstring>
+# include <algorithm>
+
 
 # include <unistd.h>			/*unistd		=>		lseek,fstat,fcntl	  */
 # include <poll.h>				/*poll			=>		poll				  */

@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 17:31:59 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:44:07 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/21 20:09:53 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,38 @@ Reply::Reply(int value, std::string message) : _value(value), _message(message)
 	_user = NULL;
 }
 
+void	Reply::add_loop(std::string loop, int pos)
+{
+	if (pos == -1)
+		_message.insert(_message.length() - 1, loop);
+	else if (pos > 0 && pos < static_cast<int>(_message.length()))
+		_message.insert(pos, loop);
+}
+
 void	Reply::add_arg(std::string arg, std::string to_replace)
 {
 	std::size_t found, size;
 	std::string balise = "<";
 	balise.append(to_replace);
 	balise.append(">");
+	size = balise.length();
+
+	if (_message.compare("") != 0)
+	{
+		found = _message.find(balise);
+		if (found != std::string::npos)
+		{
+			_message.replace(found, size, arg);
+		}
+	}
+}
+
+void	Reply::add_arg_alt(std::string arg, std::string to_replace)
+{
+	std::size_t found, size;
+	std::string balise = "[";
+	balise.append(to_replace);
+	balise.append("]");
 	size = balise.length();
 
 	if (_message.compare("") != 0)
