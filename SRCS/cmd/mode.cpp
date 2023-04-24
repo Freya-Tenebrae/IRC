@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:48:07 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/24 20:12:38 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,14 +100,15 @@ information to channel operators, or to only those clients who have permissions 
 given list.
 */
 
-bool channel_exist(std::string target)
+static bool channel_exist(Server *server, std::string target)
 {
-	(void)target;
-	// check on channels vector if channel exist and return true or false
-	return (false);
+	Channel *chan = server->find_channel(target);
+	if (chan == NULL)
+		return (false);
+	return (true);
 }
 
-bool modestring_valid(std::string modestring)
+static bool modestring_valid(std::string modestring)
 {
 	if (modestring.compare("") == 0 || (modestring[0] != '-' && modestring[0] != '+'))
 		return (false);
@@ -167,7 +168,7 @@ std::vector<Reply>	Server::mode(User *user, std::vector<std::string> args)
 		{
 			if (args[i + target][0] == '#' || args[i + target][0] == '&')
 			{
-				if (channel_exist(args[i + target]) == false)
+				if (channel_exist(this, args[i + target]) == false)
 					reply.push_back(ERR_NOSUCHCHANNEL);
 				else
 				{

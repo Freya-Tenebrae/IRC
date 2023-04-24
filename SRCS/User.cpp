@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:37:21 by plam              #+#    #+#             */
-/*   Updated: 2023/04/17 18:44:08 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/24 17:30:01 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ User::User(const int fd):_fd(fd),
 	this->_ping_pong_token = "";
 	this->_deltaTimePing = 0;
 	this->_lastTimePing = 0;
+	this->_kicked = 0;
 }
 
 User::~User() { }
@@ -115,6 +116,12 @@ void	User::set_lastTimePing(const int newLastTimePing)
 	this->_lastTimePing = newLastTimePing;
 }
 
+void	User::set_kicked(int val)
+{
+	this->_kicked = val;
+}
+
+
 const int	&User::get_fd() const
 {
 	return (this->_fd);
@@ -177,9 +184,14 @@ const int	&User::get_lastTimePing() const
 }
 
 
-const std::string	&User::get_status_message() const
+const 		std::string	&User::get_status_message() const
 {
 	return (this->_status_message);
+}
+
+int			User::get_kicked() const
+{
+	return(this->_kicked);	
 }
 
 bool	User::check_if_mode_is_used(const char mod)

@@ -6,7 +6,7 @@
 /*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/21 15:00:24 by plam             ###   ########.fr       */
+/*   Updated: 2023/04/24 16:58:49 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,29 @@ std::vector<Reply>	Server::whowas(User *user, std::vector<std::string> args)
 	std::vector<Reply> reply;
 	(void)user;
 	(void)args;
-	
+	if (args.size() == 1 || (args.size() == 2 && (args[0].compare(this->_name) || args[0] == args[1])))
+	{
+		if (args[0].empty() == false)
+		{
+			for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
+			{
+				if ((*it_usr)->get_nickname().compare(args[0]))
+				{
+					reply.push_back(RPL_WHOREPLY);
+					reply[reply.size()-1].add_arg("channel to do", "channel");
+					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "user");
+				}
+				break ;
+			}
+		}
+	}
+	else
+		reply.push_back(ERR_NOSUCHSERVER);
 	reply.push_back(RPL_ENDOFWHOWAS);
+	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+	{
+		it->add_user(user);
+		it->prep_to_send(1);
+	}
 	return (reply);
 }

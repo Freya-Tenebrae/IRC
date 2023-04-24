@@ -84,3 +84,23 @@ J'ai finalise des trucs dans poll()
 - Les FDs sont non bloquants (on a deux facons differentes au cas ou, y'a un truc a revoir avec le sujet)
 - la fonction pars tient compte du dernier char d'une ligne
 - Doc et prints etendus
+
+
+
+mmercore
+	Mon Apr 24 02:30:59 PM CEST 2023
+- Reconnect est fini
+- Bind temporize dans une boucle inf en cas de EADDRINUSE
+- Fix un crash
+- Close aussi marche
+
+
+
+mmercore
+	Mon Apr 24 06:00:11 PM CEST 2023
+- Kick qui fonctionne + vire deux exploits et une statique.
+- Getter et setter pour le status kick par user
+
+
+mmercore
+	Mon Apr 24 06:00:59 PM CEST 2023

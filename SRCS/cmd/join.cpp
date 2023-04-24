@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/21 20:28:03 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/24 20:51:24 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,15 +135,6 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 
 		const std::vector<User *> ch_usr_list_ref = chan->get_ch_usr_list();
 
-		to_send.push_back(MGS_JOIN);
-		to_send[0].add_user(user);
-		to_send[0].add_arg(chan->get_name(), "channel");
-		to_send[0].prep_to_send(1);
-
-		for (std::vector<User *>::const_iterator it = ch_usr_list_ref.begin(); it != ch_usr_list_ref.end(); it++)
-		{
-			send_message(*it, to_send[0].get_message());
-		}
 		// RPL_TOPIC (332) // maybe later
 		// RPL_TOPICWHOTIME (333) // maybe later
 
@@ -162,8 +153,22 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 
 			reply[reply.size() - 1].add_arg((*it)->get_nickname(), "nick");
 		}
+		
 		reply.push_back(RPL_ENDOFNAMES);
 		reply[reply.size() - 1].add_arg(chan->get_name(), "channel");
+		reply.push_back(MGS_JOIN);
+		reply[reply.size() - 1].add_arg(chan->get_name(), "channel");
+
+		to_send.push_back(MGS_JOIN);
+		to_send[0].add_user(user);
+		to_send[0].add_arg(chan->get_name(), "channel");
+		to_send[0].prep_to_send(1);
+
+		for (std::vector<User *>::const_iterator it = ch_usr_list_ref.begin(); it != ch_usr_list_ref.end(); it++)
+		{
+			if (*it != user)
+				send_message(*it, to_send[0].get_message());
+		}
 
 	}
 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
@@ -232,6 +237,5 @@ std::vector<Reply> Server::join(User *user, std::vector<std::string> args)
 		}
 	}
 
-	
 	return (reply);
 }

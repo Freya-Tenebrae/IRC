@@ -6,7 +6,7 @@
 /*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 18:26:22 by mmercore          #+#    #+#             */
-/*   Updated: 2023/04/17 19:33:46 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/04/24 13:46:53 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,24 +67,28 @@
 //     shutdown(server_fd, SHUT_RDWR);
 //     return 0;
 // }
-#define restart 1
 
 int	main(int ac, char **av, char **envp) {
 	(void)ac, (void)av, (void)envp;
+	int restart;
 
+	restart = 1;
 	while (restart)
 	{
 		if (ac == 1)
 		{
 			Server a;
+			restart = a.start();
 		}
 		if (ac == 2)
 		{
 			Server a(atoi(av[1]));
+			restart = a.start();
 		}
 		if (ac == 3)
 		{
 			Server a(atoi(av[1]), av[2]);
+			restart = a.start();
 		}		
 	}
 

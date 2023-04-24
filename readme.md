@@ -1,30 +1,35 @@
-# server.cpp :
-- supprimer la commande error sur server.cpp et server.hpp
-- ajouter les ping a intervale reguliser sur tous les utilisateurs
-- check au bout d'un certain temps si tous les user ont eu un pong de reponse, deconnecter ceux qui ont depasser le temps
-- ajouter un vercteur de pointeur de channel
-- ???
+# chose a check :
+- join after an invite
+- faire des test sur pirvmsg (apres avoir join pour un channel, et avec /MSG pour les mp (et /windows 1/2/3 pour changer entre les channel)) normalement ca marche
 
-# channel :
-- ???
+# choses a faire obligatoire:
+## organisation :
+- déplacer des fonction static des commande en util.cpp (et les supprimer)
 
-# commandes :
-## que l'on peut faire maintenant :
-- fix ping.cpp (au niveau du pong reply) (derniers details)
-- fix pong.cpp (et mettre a jour les donnees) (derniers details)
-
-## complexe :
+## commandes :
+- faire RPL_AWAY sur client et privmsg
+- revoir tous les Reply sur privmsg
+- faire notice.cpp
 - faire kill.cpp
 - faire restart.cpp (voir a faire des modif sur la classe server.cpp)
+- faire invite.cpp
+- faire kick.cpp
+- finir mode.cpp (pour les channel)
+
+# chose a faire en option :
+## server.cpp :
+- ajouter les ping a intervale reguliser sur tous les utilisateurs
+- check au bout d'un certain temps si tous les user ont eu un pong de reponse, deconnecter ceux qui ont depasser le temps
+
+## commandes :
+- fix ping.cpp (au niveau du pong reply) (derniers details) // option
+- fix pong.cpp (et mettre a jour les donnees) (derniers details)
 
 ## commandes avec channel :
-- faire invite.cpp (une fois la classe channel.cpp finie)
-- faire join.cpp (une fois la classe channel.cpp finie)
-- faire kick.cpp (une fois la classe channel.cpp finie)
-- faire list.cpp (une fois la classe channel.cpp finie)
-- finir mode.cpp pour les channel (une fois la classe channel.cpp finie)
-- faire names.cpp (une fois la classe channel.cpp finie)
-- faire privmsg.cpp (une fois la classe channel.cpp finie)
-- faire notice.cpp (une fois la classe channel.cpp finie) (une fois privmsg.cpp fini)
-- faire part.cpp (une fois la classe channel.cpp finie)
-- faire topic.cpp (une fois le lien delete sur server.cpp)
+- faire list.cpp
+- faire topic.cpp
+- faire names.cpp
+- faire part.cpp
+
+# autres
+- check a faire une commande ban ?

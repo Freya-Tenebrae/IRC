@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   who.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/21 20:26:45 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/24 16:55:59 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,46 +63,50 @@ Reply Examples:
 std::vector<Reply>	Server::who(User *user, std::vector<std::string> args)
 {
 	std::vector<Reply> reply;
-    (void)user;
-    (void)args;
-	// if (args.size() == 1)
-	// {
-	// 	if (args[0].empty() == false) 
-	// 	{
-	// 		if (args[0][0] == '#')
-	// 		{			
-	// 			std::vector<Channel *>::iterator it;
-	// 			it = find(this->_cha_list.begin(), this->_cha_list.end(), args.begin());
-	// 			if (it != this->_cha_list.end())
-	// 			{
-	// 				for (std::vector<User *>::iterator it = this->_usr_list.begin(); it < this->_usr_list.end(); it++)
-	// 				{
-	// 					reply.push_back(RPL_WHOREPLY);
-	// 					reply[reply.size()-1].add_arg("channel to do", "channel");
-	// 					reply[reply.size()-1].add_arg("user to apply", "user");
-
-	// 				}
-	// 			}
-	// 		}
-	// 		else
-	// 		{
-	// 			std::vector<User *>::iterator it;
-	// 			it = find(this->_usr_list.begin(), this->_usr_list.end(), args.begin());
-	// 			if (it != this->_usr_list.end())
-	// 			{
-	// 				reply.push_back(RPL_WHOREPLY);
-	// 				reply[reply.size()-1].add_arg("user to apply", "user");
-	// 			}
-	// 		}
-	// 	}
-	// 	else
-	// 		reply.push_back(ERR_NOSUCHSERVER);
-	// 	reply.push_back(RPL_ENDOFWHO);
-	// }
-	// for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
-	// {
-	// 	it->add_user(user);
-	// 	it->prep_to_send(1);
-	// }
+	if (args.size() == 1)
+	{
+		if (args[0].empty() == false) 
+		{
+			if (args[0][0] == '#')
+			{			
+				args[0].erase(0, 1);
+				for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
+				{
+					if ((*it)->get_name().compare(args[0]))
+					{
+						const std::vector<User *> ch_usr_list_ref = (*it)->get_ch_usr_list();
+						for (std::vector<User *>::const_iterator it_usr = ch_usr_list_ref.begin(); it_usr != ch_usr_list_ref.end(); it_usr++)
+						{
+							reply.push_back(RPL_WHOREPLY);
+							reply[reply.size()-1].add_arg("channel to do", "channel");
+							reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "user");
+						}
+						break ;
+					}
+				}
+			}
+			else
+			{
+				for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
+				{
+					if ((*it_usr)->get_nickname().compare(args[0]))
+					{
+						reply.push_back(RPL_WHOREPLY);
+						reply[reply.size()-1].add_arg("channel to do", "channel");
+						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "user");
+					}
+					break ;
+				}
+			}
+		}
+		else
+			reply.push_back(ERR_NOSUCHSERVER);
+		reply.push_back(RPL_ENDOFWHO);
+	}
+	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+	{
+		it->add_user(user);
+		it->prep_to_send(1);
+	}
 	return (reply);
 }

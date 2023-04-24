@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/21 18:52:23 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/24 20:33:13 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 # define NEW_CONNECTION_MESSAGE "You have connected to FT_IRC\n"
 # define VERSION "0.3"
 # define CRLF "\r"
+# define MAX_USERS 100
 
 typedef struct	e_sock_conf {
 //	void			socket_params;
@@ -138,18 +139,21 @@ class Server {
 		int			call_bind(int fd, ssock * addrptr, socklen_t addrlen);
 
 		int			call_listen(int fd, int backlog_hint=SOMAXCONN);
+		
+		int			start();
 
 		int			polling_loop();
 
 		int			compilecommand(char *message, int fd);
 
 		User						*find_user(int fd);
+		User						*find_user_by_nickname(std::string nickname);
 		Channel						*find_channel(std::string channel_name);
 		void						run_buffer(int fd, std::string buffer);
 		std::vector<std::string>	pars_buffer(std::string &buffer);
 		void						run_line(User *user, std::string &line);
 		std::vector<std::string>	pars_line(std::string &line);
-		void						send_message(User *user, std::string message);
+		void						send_message(const User *user, std::string message);
 		std::vector<Reply>			command(User *user, std::string commandName, std::vector<std::string> args);
 		
 
@@ -197,6 +201,8 @@ class Server {
 		std::vector<Reply>			info(User *user, std::vector<std::string> args);
 		std::vector<Reply>			mode(User *user, std::vector<std::string> args);
 		std::vector<Reply>			privmsg(User *user, std::vector<std::string> args);
+		std::vector<Reply>			privmsg_channel(User *user, std::vector<std::string> &args, std::string &message);
+		std::vector<Reply>			privmsg_user(User *user, const User *target, std::string &message);
 		std::vector<Reply>			notice(User *user, std::vector<std::string> args);
 		std::vector<Reply>			who(User *user, std::vector<std::string> args);
 		std::vector<Reply>			whois(User *user, std::vector<std::string> args);
@@ -214,7 +220,8 @@ class Server {
 		//https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html
 		// Equivalent a struct sockaddr* en cast, supporte plus d'implementations
 		ssocki	_address;
-		spollfd	fds[100];
+		spollfd	fds[MAX_USERS];
+		str		_buffers[MAX_USERS];
 		
 };
 

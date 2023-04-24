@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/04/21 18:53:05 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/24 20:14:35 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,10 @@ Server::Server(int port, str password, t_sock_conf sock_conf):_password(password
 		return ;
 	}
 	set_socketfd(-1 ,sock_conf);
+	if (!this->errval && !call_fcntl(get_socketfd(), sock_conf.optname2))
+	{
+		PRERR "FCNTL HAPPENED AND SUCCESS" ENDL
+	}
 	if (!this->errval && !set_sockopt(sock_conf.level, sock_conf.optname, (const void *)((unsigned long)&sock_conf + (unsigned long)sock_conf.optval), sock_conf.optlen))
 	{
 		//this->errval = nothing;
@@ -70,10 +74,10 @@ Server::Server(int port, str password, t_sock_conf sock_conf):_password(password
 		this->_address.sin_port = htons(get_port());
 		PRERR "SETSOCKOPT HAPPENED AND ERRVAL " << this->errval ENDL;
 	}
-	if (!this->errval && !call_fcntl(get_socketfd(), sock_conf.optname2))
-	{
-		PRERR "FCNTL HAPPENED AND SUCCESS" ENDL
-	}
+//	if (!this->errval && !call_fcntl(get_socketfd(), sock_conf.optname2))
+//	{
+//		PRERR "FCNTL HAPPENED AND SUCCESS" ENDL
+//	}
 	if (!this->errval && !call_bind(get_socketfd(), (ssock *)&(this->_address), sizeof((this->_address))))
 	{
 		PRERR "BIND SUCCESS" ENDL;
@@ -82,7 +86,8 @@ Server::Server(int port, str password, t_sock_conf sock_conf):_password(password
 	{
 		PRERR "LISTEN SUCCESS" ENDL;
 	}
-	polling_loop();
+	if (!this->errval)
+		PRINT "SERVER SUCCESSFULLY STARTED" ENDL;
 }
 
 Server::~Server()
@@ -93,6 +98,15 @@ Server::~Server()
 		PRINT "Server closed successfully with no issues" ENDL
 	else
 		PRINT "Error: Safe close. The errval is " << get_errval(this->errval) << " and the errno is " << strerror(errno) ENDL
+	
+	if (this->errval == server_restart)
+	{
+		PRINT "The server will be restarting" ENDL;
+	}
+	else
+	{
+		PRINT "The server will not be restarting" ENDL;
+	}
 }
 
 str			Server::get_errval(t_serv_error errval) const
@@ -159,7 +173,7 @@ int		Server::set_sockopt(int level, int optname, const void *optval, socklen_t o
 	{
 		PRERR "FAILED TO SET SOCKET OPTION" ENDL;
 		this->errval = sock_opt_fail;
-		return (1);
+		return (1);	
 	}
 	return (0);
 }
@@ -205,13 +219,50 @@ int			Server::call_fcntl(int fd, int request)
 
 int		Server::call_bind(int fd, ssock * addrptr, socklen_t addrlen)
 {
-	if (bind(fd, addrptr, addrlen) < 0)
+	int inusewarning;
+	long threedots;
+	int wait;
+
+	inusewarning = 1;
+	threedots = 1;
+	//PRINT "ATTEMPTING BIND ON FD " << fd << " AND PORT " << this->get_port() ENDL;
+	while (true)
 	{
-		this->errval = bind_fail;
-		return (1);
+		wait = 0;
+		while (wait++ == -1);
+		if (bind(fd, addrptr, addrlen) < 0)
+		{
+			if (errno != EADDRINUSE)
+			{
+				this->errval = bind_fail;
+				return (1);
+			}
+			if (inusewarning)
+			{
+				PRERR "EADDRINUSE, RECONECTING..." ENDL;
+				inusewarning = 0;
+			}
+			if (threedots % 10000000 == 0)
+			{
+				PRERR "..." ENDL;
+				if (threedots == 50000000)
+					PRERR "Did you know every \"...\" is 10000000 syscalls ?" ENDL;
+				if (threedots == 80000000)
+					PRERR "In case you are wondering, sleep() or usleep() are not allowed functions" ENDL;
+				if (threedots == 140000000)
+					PRERR "You don't need to close any netcat or IRSSI connections to restart, they timeout automatically. \n However it is faster to do so !" ENDL;
+				if (threedots == 170000000)
+					PRERR "Outstanding project pls <3" ENDL;
+			}
+			threedots++;
+		}
+		else
+		{
+			PRERR "SUCCESS BIND" ENDL
+			return (0);
+		}
 	}
-	PRERR "ONE SUCCESS BIND" ENDL
-	return (0);
+
 }
 
 int		Server::call_listen(int fd, int backlog_hint)
@@ -221,6 +272,14 @@ int		Server::call_listen(int fd, int backlog_hint)
 		this->errval = listen_fail;
 		return(1);
 	}
+	return (0);
+}
+
+int		Server::start()
+{
+	polling_loop();
+	if (this->errval == server_restart)
+		return (1);
 	return (0);
 }
 
@@ -314,11 +373,12 @@ int		Server::polling_loop()
 						// MSG_DONTWAIT for nonblock sim
 						PRERR "READ" ENDL
 						recv_ret = recv(fds[fd_cursor].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
-						if (recv_ret <= 0)
+						if (recv_ret <= 0 || find_user(fds[fd_cursor].fd)->get_kicked() == 1 || this->errval != 0)
 						{
 							// erreurs & close
-							if (errno != EWOULDBLOCK || recv_ret == 0 || this->errval == server_close || this->errval == server_restart || this->errval == user_close)
+							if (errno != EWOULDBLOCK || recv_ret == 0 || this->errval == server_close || this->errval == server_restart || (this->errval == user_close && find_user(fds[fd_cursor].fd)->get_kicked() == 1))
 							{
+								send(fds[fd_cursor].fd, "The server has closed the connection.\n", sizeof(char) * 38, 0);
 								close(fds[fd_cursor].fd);
 								//this->errval = recv_fail;
 								PRERR "ERREURS ET CLOSE" ENDL
@@ -345,8 +405,10 @@ int		Server::polling_loop()
 								while (i < fd_counter)
 								{
 									fds[i] = fds[i + 1];
+									_buffers[i] = _buffers[i + 1];
 									i++;
 								}
+								_buffers[i].clear();
 								fds[i].fd = 0;
 								fds[i].events = 0;
 								fd_counter--;
@@ -369,8 +431,8 @@ int		Server::polling_loop()
 							//run_buffer(fds[fd_cursor].fd, buffer);
 
 
-
-							//send(fds[fd_cursor].fd, buffer, sizeof(buffer), 0);
+							//send(fds[fd_cursor].fd, "\r\n", sizeof(char)*2, 0);
+							// send(fds[fd_cursor].fd, buffer, sizeof(buffer), 0);
 							// Errors	
 						}
 					} while (compilecommand(buffer, fds[fd_cursor].fd));
@@ -385,6 +447,7 @@ int		Server::polling_loop()
 		fd_cursor = 1;
 		while (fd_cursor < fd_counter)
 		{
+			send(fds[fd_cursor].fd, "The server has closed the connection.\n", sizeof(char) * 38, 0);
 			close(fds[fd_cursor].fd);
 			PRERR "ERREURS ET CLOSE" ENDL
 			for (std::vector<User *>::iterator it = _usr_list.begin(); it != _usr_list.end(); it++)
@@ -405,8 +468,10 @@ int		Server::polling_loop()
 			while (i < fd_counter)
 			{
 				fds[i] = fds[i + 1];
+				_buffers[i] = _buffers[i + 1];
 				i++;
 			}
+			_buffers[i].clear();
 			fds[i].fd = 0;
 			fds[i].events = 0;
 			fd_counter--;
@@ -417,27 +482,27 @@ int		Server::polling_loop()
 
 int		Server::compilecommand(char *message, int fd)
 {
-	static str m;
-
-	m.append(message);
-	if (m.find("EVACWINCHESTER") != str::npos)
+	this->_buffers[fd].append(message);
+	if (this->_buffers[fd].find("EVACWINCHESTER") != str::npos)
 	{
 		this->errval = server_restart;
-		m.clear();
-		return (0);
+		this->_buffers[fd].clear();
+		return (1);
 	}
-	if (m.find("CLOSEME") != str::npos)
+	if (this->_buffers[fd].find("CLOSEME") != str::npos)
 	{
+		find_user(fd)->set_kicked(1);
+		//close(fd);
 		this->errval = user_close;
-		m.clear();
-		return (0);
+		this->_buffers[fd].clear();
+		return (1);
 	}
-	PRERR "Message size  " << m ENDL;
-	if (m.find(CRLF) != str::npos && m.length() > 3)
+	PRERR "Message size  " << this->_buffers[fd] ENDL;
+	if (this->_buffers[fd].find(CRLF) != str::npos)
 	{
 		PRERR "Correct message, going for the parse" ENDL;
-		run_buffer(fd, m.c_str());
-		m.clear();
+		run_buffer(fd, this->_buffers[fd].c_str());
+		this->_buffers[fd].clear();
 		return (0);
 	}
 	else
@@ -452,6 +517,16 @@ User	*Server::find_user(int fd)
 	for (std::vector<User *>::iterator it = _usr_list.begin(); it != _usr_list.end(); it++)
 	{
 		if ((*it)->get_fd() == fd)
+			return (*it);
+	}
+	return (NULL);
+}
+
+User	*Server::find_user_by_nickname(std::string nickname)
+{
+	for (std::vector<User *>::iterator it = _usr_list.begin(); it != _usr_list.end(); it++)
+	{
+		if ((*it)->get_nickname().compare(nickname) == 0)
 			return (*it);
 	}
 	return (NULL);
@@ -551,7 +626,7 @@ std::vector<std::string>	Server::pars_line(std::string &line)
 	return args;
 }
 
-void	Server::send_message(User *user, std::string message)
+void	Server::send_message(const User *user, std::string message)
 {
 	if (message.compare("") != 0)
 	{

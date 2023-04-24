@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 12:46:03 by plam              #+#    #+#             */
-/*   Updated: 2023/03/30 16:56:04 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/24 17:29:52 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class User
 		User();
 		User(const User &other);		//copy member function
 		User				&operator=(const User &other);
+		int					_kicked;
 
 	protected:
 		int					_fd;		// fd of the User
@@ -61,6 +62,8 @@ class User
 		void				set_ping_pong_token(const std::string newPing_pong_token);
 		void				set_deltaTimePing(const int newDeltaTimePing);
 		void				set_lastTimePing(const int newLastTimePing);
+		void				set_kicked(int val);
+
 
 		//getter member functions
 		const int			&get_fd() const;
@@ -76,6 +79,8 @@ class User
 		const std::string	&get_ping_pong_token() const;
 		const int			&get_deltaTimePing() const;
 		const int			&get_lastTimePing() const;
+		int					get_kicked() const;
+
 
 		bool				check_if_mode_is_used(const char mod);
 		void				add_usermode(const char newMod);
