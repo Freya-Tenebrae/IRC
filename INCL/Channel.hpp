@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 12:51:43 by plam              #+#    #+#             */
-/*   Updated: 2023/04/21 19:34:47 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 19:56:25 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class Channel
 		int									_number_max_user;
 		std::vector<User *>					_ch_usr_list;
 		std::multimap<char, std::string>	_channelmode;
+		std::string							_topic;
 
 	public:
 		Channel();
@@ -61,16 +62,19 @@ class Channel
 
 		bool						check_if_simple_mode_is_used(const char mod);
 		void						add_simple_channelmode(const char newMod);
-		void						del_simple_usermode(const char oldMod);
+		void						del_simple_channelmode(const char oldMod);
 
 		bool						check_if_complexe_mode_is_used(const char mod);
 		bool						check_if_complexe_mode_is_correct(const char mod, const std::string mask);
 		void						add_complex_channelmode(const char newMod, const std::string newmask);
-		void						del_complex_usermode(const char oldMod, const std::string oldmask);
+		void						del_complex_channelmode(const char oldMod, const std::string oldmask);
 
 		bool						check_if_specific_mode_is_used(const char mod);
-		void						add_complex_channelmode(const char newMod, const int n);
-		void						del_complex_usermode(const char oldMod);
+		void						add_specific_channelmode(const char newMod, const int n);
+		void						del_specific_channelmode(const char oldMod);
+
+		void						set_topic(std::string newTopic);
+		const std::string			&get_topic();
 };
 
 #endif

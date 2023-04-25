@@ -104,3 +104,21 @@ mmercore
 
 mmercore
 	Mon Apr 24 06:00:59 PM CEST 2023
+
+
+
+mmercore
+	Tue Apr 25 03:43:36 PM CEST 2023
+Ajout du close, check des leaks
+
+
+
+mmercore
+	Tue Apr 25 04:26:06 PM CEST 2023
+Ajout de close.cpp, commandes squit, kill et restart
+
+
+
+mmercore
+	Tue Apr 25 07:34:49 PM CEST 2023
+Fix fcntl plus ajout de debut de bot (make bonus)

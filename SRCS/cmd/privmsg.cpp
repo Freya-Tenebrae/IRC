@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/24 20:36:19 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 21:12:24 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,19 +88,24 @@ std::vector<Reply> Server::privmsg_channel(User *user, std::vector<std::string> 
 
 	for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
 	{
-		if ((*it)->get_name().compare(args[0]))
+		std::string chan_name = (*it)->get_name();
+		chan_name.erase(0, 1);
+		if (chan_name.compare(args[0]) == 0)
 		{
 			if ((*it)->check_if_complexe_mode_is_used('b') == true && (*it)->check_if_complexe_mode_is_correct('b', user->get_nickname()) == true && \
 				(*it)->check_if_complexe_mode_is_correct('e', user->get_nickname()) == false && (*it)->check_if_complexe_mode_is_correct('o', user->get_nickname()) == false) // tmp ban on nickname
 			{
 				reply.push_back(ERR_BANNEDFROMCHAN);
+				reply[reply.size() - 1].add_arg((*it)->get_name(), "channel");
 				reply.push_back(ERR_CANNOTSENDTOCHAN);
+				reply[reply.size() - 1].add_arg((*it)->get_name(), "channel");
 			}
 			else if (((*it)->check_if_simple_mode_is_used('n') == true && user_is_on_channel(*it, user) == false) || \
 					((*it)->check_if_simple_mode_is_used('m') == true && \
 					((*it)->check_if_complexe_mode_is_correct('o', user->get_nickname()) == false && (*it)->check_if_complexe_mode_is_correct('v', user->get_nickname()) == false)))
 			{
 				reply.push_back(ERR_CANNOTSENDTOCHAN);
+				reply[reply.size() - 1].add_arg((*it)->get_name(), "channel");
 			}
 			else
 			{
@@ -109,7 +114,6 @@ std::vector<Reply> Server::privmsg_channel(User *user, std::vector<std::string> 
 				to_send[0].add_arg((*it)->get_name(), "channel_or_client");
 				to_send[0].add_arg(message, "message");
 				to_send[0].prep_to_send(1);
-				reply.push_back(RPL_NONE);
 
 				for (std::vector<User *>::const_iterator it_usr = (*it)->get_ch_usr_list().begin(); it_usr != (*it)->get_ch_usr_list().end(); it_usr++)
 				{
@@ -132,7 +136,7 @@ std::vector<Reply> Server::privmsg_user(User *user, const User *target, std::str
 	{
 		reply.push_back(RPL_AWAY);
 		reply[reply.size() - 1].add_arg(target->get_nickname(), "nick");
-		reply[reply.size() - 1].add_arg("away message -> TODO", "message");
+		reply[reply.size() - 1].add_arg(target->get_status_message(), "message");
 	}
 
 	to_send.push_back(MSG_PRIVMSG);
@@ -174,7 +178,10 @@ std::vector<Reply>	Server::privmsg(User *user, std::vector<std::string> args)
 		if (args[target][0] == '#' || args[target][0] == '&')
 		{
 			if (channel_exist(this, args[target]) == false)
+			{
 				reply.push_back(ERR_NOSUCHCHANNEL);
+				reply[reply.size() - 1].add_arg(args[target], "channel");
+			}
 			else
 			{
 				std::vector<Reply> tmp_reply = privmsg_channel(user, args, message);
@@ -185,7 +192,10 @@ std::vector<Reply>	Server::privmsg(User *user, std::vector<std::string> args)
 		{
 			const User *user_target = find_user_by_nickname(args[target]);
 			if (user_target == NULL)
+			{
 				reply.push_back(ERR_NOSUCHNICK);
+				reply[reply.size() - 1].add_arg(args[target], "nickname");
+			}
 			else
 			{
 				std::vector<Reply> tmp_reply = privmsg_user(user, user_target, message);

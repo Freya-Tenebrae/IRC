@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:43:51 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 19:11:30 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ std::vector<Reply>	Server::pong(User *user, std::vector<std::string> args)
 		reply.push_back(ERR_TOKENMISMATCH);
 	else
 	{
-		// update ping/pong value on User.cpp
+		// update ping/pong value on User.cpp // not used in this irc serv
 		reply.push_back(RPL_NONE);
 	}
 	reply[0].add_user(user);

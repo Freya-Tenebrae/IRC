@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/24 20:12:38 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 18:05:24 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,12 @@ information to channel operators, or to only those clients who have permissions 
 given list.
 */
 
+/*
+
+	WE CHOSE TO ONLY WORK WITH ONLY ONE TARGET 
+
+*/
+
 static bool channel_exist(Server *server, std::string target)
 {
 	Channel *chan = server->find_channel(target);
@@ -120,19 +126,104 @@ static bool modestring_valid(std::string modestring)
 	return (true);
 }
 
-static void	apply_mode_on_user(User *user, std::vector<std::string> &args, std::vector<Reply> &reply, unsigned long &i)
+static void	reply_channel_mode(Channel *chan, std::vector<std::string> &args, std::vector<Reply> &reply)
+{
+	int target = 0;
+
+	reply.push_back(RPL_CHANNELMODEIS);
+	reply[reply.size() - 1].add_arg(args[target], "channel");
+	for (std::multimap<char, std::string>::const_iterator it = chan->get_channelmode().begin(); it != chan->get_channelmode().end(); it++)
+	{
+		std::string modestring = "";
+		modestring.append(1, it->first);
+		std::string m_args = it->second;
+
+		reply[reply.size() - 1].add_loop(RPL_CHANNELMODEIS_LOOP);
+		reply[reply.size() - 1].add_arg(modestring, "modestring");
+		reply[reply.size() - 1].add_arg(m_args, "mode arguments");
+	}
+
+	// RPL_BANLIST
+	// RPL_ENDOFBANLIST
+	// RPL_EXCEPTLIST
+	// RPL_ENDOFEXCEPTLIST
+	// RPL_INVITELIST
+	// RPL_ENDOFINVITELIST
+}
+
+static void	apply_mode_on_channel(Channel *chan, std::vector<std::string> &args, std::vector<Reply> &reply)
+{
+	int		argument_ptr = 1;
+	int		modestring = 1;
+	bool	all_mode_are_valid = true;
+	bool	is_addition = true;
+
+	if (modestring_valid(args[modestring]) == false)
+		reply.push_back(ERR_UMODEUNKNOWNFLAG);
+	else
+	{
+		if (args[modestring][0] == '-')
+			is_addition = false;
+		for (std::string::iterator it = args[modestring].begin() + 1; it != args[modestring].end(); it++)
+		{
+			std::string sim_mode = SIMPLE_CHANNEL_MODE_AVAILABLE;
+			std::string com_mode = COMPLEX_CHANNEL_MODE_AVAILABLE;
+			std::string spe_mode = SPECIFIC_CHANNEL_MODE_AVAILABLE;
+
+
+			if (sim_mode.find(*it) == std::string::npos && com_mode.find(*it) == std::string::npos && spe_mode.find(*it) == std::string::npos)
+				all_mode_are_valid = false;
+			else if (sim_mode.find(*it) != std::string::npos)
+			{
+				if (is_addition == true && chan->check_if_simple_mode_is_used(*it) == false)
+					chan->add_simple_channelmode(*it);
+				else if (is_addition == false && chan->check_if_simple_mode_is_used(*it) == true)
+					chan->del_simple_channelmode(*it);
+			}
+			else if (com_mode.find(*it) != std::string::npos)
+			{
+				std::string mask = args[modestring + argument_ptr++];
+				if (is_addition == true && chan->check_if_complexe_mode_is_correct(*it, mask) == false)
+					chan->add_complex_channelmode(*it, mask);
+				else if (is_addition == false && chan->check_if_complexe_mode_is_correct(*it, mask) == true)
+					chan->del_complex_channelmode(*it, mask);
+			}
+			else
+			{
+				if (is_addition == true)
+				{
+					std::string s_value = args[modestring + argument_ptr++];
+					std::stringstream strstr;
+					int value;
+					strstr << s_value;
+					strstr >> value;
+
+					chan->add_specific_channelmode(*it, value);
+				}
+				else if (is_addition == false && chan->check_if_specific_mode_is_used(*it) == true)
+					chan->del_specific_channelmode(*it);
+			}
+		}
+
+		if (all_mode_are_valid != true)
+			reply.push_back(ERR_UMODEUNKNOWNFLAG);
+		reply_channel_mode(chan, args, reply);
+	}
+}
+
+static void	apply_mode_on_user(User *user, std::vector<std::string> &args, std::vector<Reply> &reply)
 {
 	bool	all_mode_are_valid = true;
 	int		modestring = 1;
 	bool	is_addition = true;
 
-	if (modestring_valid(args[i + modestring]) == false)
+	if (modestring_valid(args[modestring]) == false)
 		reply.push_back(ERR_UMODEUNKNOWNFLAG);
 	else
 	{
-		if (args[i + modestring][0] == '-')
+		if (args[modestring][0] == '-')
 			is_addition = false;
-		for (std::string::iterator it = args[i + modestring].begin() + 1; it != args[i + modestring].end(); it++)
+		for (std::string::iterator it = args[modestring].begin() + 1; it != args[modestring].end(); it++)
 		{
 			std::string str = USER_MODE_AVAILABLE;
 			if (str.find(*it) == std::string::npos)
@@ -153,8 +244,8 @@ static void	apply_mode_on_user(User *user, std::vector<std::string> &args, std::
 std::vector<Reply>	Server::mode(User *user, std::vector<std::string> args)
 {
 	std::vector<Reply> reply;
-	int target = 0;
-	int modestring = 1;
+	unsigned long target = 0;
+	unsigned long modestring = 1;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
@@ -164,32 +255,41 @@ std::vector<Reply>	Server::mode(User *user, std::vector<std::string> args)
 		reply.push_back(ERR_NEEDMOREPARAMS);
 	else
 	{
-		for (unsigned long i = 0; i < args.size(); i += 2)
+		if (args[target][0] == '#' || args[target][0] == '&')
 		{
-			if (args[i + target][0] == '#' || args[i + target][0] == '&')
-			{
-				if (channel_exist(this, args[i + target]) == false)
-					reply.push_back(ERR_NOSUCHCHANNEL);
-				else
-				{
-					// if channel
-					// only channel orperator can do this command
-				}
-			}
+			if (channel_exist(this, args[target]) == false)
+				reply.push_back(ERR_NOSUCHCHANNEL);
 			else
 			{
-				if (user->get_nickname().compare(args[i + target]) != 0)
-					reply.push_back(ERR_USERSDONTMATCH);
+				Channel *chan = find_channel(args[target]);
+
+				if (modestring == args.size())
+					reply_channel_mode(chan, args, reply);
 				else
 				{
-					if (i + modestring == args.size())
+					if (chan->check_if_complexe_mode_is_correct('o', user->get_nickname()) == false)
 					{
-						reply.push_back(RPL_UMODEIS);
-						reply.back().add_arg(user->get_usermode(), "user modes");
+						reply.push_back(ERR_CHANOPRIVSNEEDED);
+						reply[reply.size() - 1].add_arg(args[target], "channel");
 					}
 					else
-						apply_mode_on_user(user, args, reply, i);
+						apply_mode_on_channel(chan, args, reply);
 				}
+			}
+		}
+		else
+		{
+			if (user->get_nickname().compare(args[target]) != 0)
+				reply.push_back(ERR_USERSDONTMATCH);
+			else
+			{
+				if (modestring == args.size())
+				{
+					reply.push_back(RPL_UMODEIS);
+					reply.back().add_arg(user->get_usermode(), "user modes");
+				}
+				else
+					apply_mode_on_user(user, args, reply);
 			}
 		}
 	}

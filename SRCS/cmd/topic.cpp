@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   topic.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:47:53 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 19:59:49 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,88 @@ Command Examples:
   TOPIC #test                     ; Checking the topic for "#test"
 */
 
+static bool channel_exist(Server *server, std::string target)
+{
+	Channel *chan = server->find_channel(target);
+	if (chan == NULL)
+		return (false);
+	return (true);
+}
+
+static bool user_is_on_channel(Channel *chan, User *user)
+{
+	for (std::vector<User *>::const_iterator it = chan->get_ch_usr_list().begin(); it != chan->get_ch_usr_list().end(); it++)
+	{
+		if (*it == user)
+			return (true);
+	}
+	return (false);
+}
+
 std::vector<Reply>	Server::topic(User *user, std::vector<std::string> args)
 {
 	std::vector<Reply> reply;
-	(void)user;
-	(void)args;
 
-	// only channel orperator can change the topic of a channel
-	
+	if (user->get_status() == USR_STAT_BAN)
+		reply.push_back(ERR_YOUREBANNEDCREEP);
+	else if (user->get_connected() == false)
+		reply.push_back(ERR_NOTREGISTERED);
+	else if (args.empty() == true || args[0].compare("") == 0)
+		reply.push_back(ERR_NEEDMOREPARAMS);
+	else
+	{
+		if (args.size() == 1 && args[0][0] == '#')
+		{
+			if (channel_exist(this, args[0]))
+			{
+				Channel	*chan = find_channel(args[0]);
+				if (user_is_on_channel(chan, user) == true)			//verify if the static function work correctly
+				{
+					if (chan->get_topic().empty() == false)
+					{
+						reply.push_back(RPL_TOPIC);
+						reply[reply.size()-1].add_arg(chan->get_topic(), "topic");
+					}
+					else
+						reply.push_back(RPL_NOTOPIC);
+				}
+				else
+					reply.push_back(ERR_NOTONCHANNEL);
+			}
+			else
+				reply.push_back(ERR_NOSUCHCHANNEL);
+		}
+		else if (args.size() == 2 && args[0][0] == '#')
+		{
+			if (channel_exist(this, args[0]))
+			{
+				Channel	*chan = find_channel(args[0]);
+				if (user_is_on_channel(chan, user) == true)			//verify if the static function work correctly
+				{
+					if (chan->check_if_simple_mode_is_used('t') == true)		// see if operators are the only users that can change the topic in the server
+					{
+						if (user->check_if_mode_is_used('o') == true || user->check_if_mode_is_used('v'))		// only channel operator can change the topic of a channel
+						{
+							chan->set_topic(args[1]);
+							reply.push_back(RPL_TOPIC);
+						}
+					}
+					else
+						reply.push_back(ERR_CHANOPRIVSNEEDED);
+				}
+				else
+					reply.push_back(ERR_NOTONCHANNEL);
+			}
+			else
+				reply.push_back(ERR_NOSUCHCHANNEL);
+		}
+		else
+			reply.push_back(ERR_NOSUCHCHANNEL);
+	}
+	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+	{
+		it->add_user(user);
+		it->prep_to_send(1);
+	}
 	return (reply);
 }

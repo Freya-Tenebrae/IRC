@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/24 20:33:13 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 21:22:15 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,6 @@ class Server {
 		std::vector<Reply>			part(User *user, std::vector<std::string> args);
 		std::vector<Reply>			topic(User *user, std::vector<std::string> args);
 		std::vector<Reply>			names(User *user, std::vector<std::string> args);
-		std::vector<Reply>			list(User *user, std::vector<std::string> args);
 		std::vector<Reply>			invite(User *user, std::vector<std::string> args);
 		std::vector<Reply>			kick(User *user, std::vector<std::string> args);
 		std::vector<Reply>			motd(User *user, std::vector<std::string> args);
@@ -204,6 +203,8 @@ class Server {
 		std::vector<Reply>			privmsg_channel(User *user, std::vector<std::string> &args, std::string &message);
 		std::vector<Reply>			privmsg_user(User *user, const User *target, std::string &message);
 		std::vector<Reply>			notice(User *user, std::vector<std::string> args);
+		void 						notice_channel(User *user, std::vector<std::string> &args, std::string &message);
+		void 						notice_user(User *user, const User *target, std::string &message);
 		std::vector<Reply>			who(User *user, std::vector<std::string> args);
 		std::vector<Reply>			whois(User *user, std::vector<std::string> args);
 		std::vector<Reply>			whowas(User *user, std::vector<std::string> args);
@@ -215,6 +216,7 @@ class Server {
 		std::vector<Reply>			links(User *user, std::vector<std::string> args);
 		std::vector<Reply>			userhost(User *user, std::vector<std::string> args);
 		std::vector<Reply>			wallops(User *user, std::vector<std::string> args);
+		std::vector<Reply>			close_server(User *user, std::vector<std::string> args);
 
 
 		//https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html

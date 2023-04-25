@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 17:32:30 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/24 19:41:25 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 20:04:05 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,8 @@ class Reply
 #define RPL_LISTSTART Reply(321, "<client> Channel :Users  Name\n")
 #define RPL_LIST Reply(322, "<client> <channel> <client count> :<topic>\n")
 #define RPL_LISTEND Reply(323, "<client> :End of /LIST\n")
-#define RPL_CHANNELMODEIS Reply(324, "<client> <channel> <modestring> <mode arguments>...\n")
+#define RPL_CHANNELMODEIS Reply(324, "<client> <channel>\n")
+#define RPL_CHANNELMODEIS_LOOP " <modestring> <mode arguments>"
 #define RPL_CREATIONTIME Reply(329, "<client> <channel> <creationtime>\n")
 #define RPL_WHOISACCOUNT Reply(330, "<client> <nick> <account> :is logged in as\n")
 #define RPL_NOTOPIC Reply(331, "<client> <channel> :No topic is set\n")
@@ -191,11 +192,13 @@ class Reply
 
 
 #define ERR_TOKENMISMATCH Reply(0, "<client> :token incorrect\n")
-#define RPL_PONG Reply(0, "<client> :PONG <tocken>\n")
+#define RPL_PONG Reply(0, "PONG :<tocken>\n")
 #define RPL_NICKSET Reply(0, "NICK :<client>\n")
 #define MGS_WALLOP Reply(0, "WALLOP <message>\n")
 #define MGS_JOIN Reply(0, "JOIN :<channel>\n")
 #define MSG_PRIVMSG Reply(0, "PRIVMSG <channel_or_client> :<message>\n")
+#define MSG_NOTICE Reply(0, "NOTICE <channel_or_client> :<message>\n")
+#define MSG_PART Reply(0, "PART <channel> :<message>\n")
 
 #define ERR_ERROSAMENICKNAME Reply(434, "<client> :you already use this nickname\n")
 

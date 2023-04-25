@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/04/24 20:14:35 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 21:22:25 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,12 +201,18 @@ void		Server::set_version(std::string version)
 
 int			Server::call_fcntl(int fd, int request)
 {
-	int flags;
+//	int flags;
 
-	flags = fcntl(fd, F_GETFL, 0);
+	//flags = fcntl(fd, F_GETFL, 0);
 	//PRERR "Before FCNTL flags are " <<  fcntl(fd, F_GETFL, 0) ENDL;
 	//PRERR "We are putting the flag " << request ENDL
-	if (flags == -1 || fcntl(fd, F_SETFL, flags | request) < 0)
+	// if (flags == -1 || fcntl(fd, F_SETFL, flags | request) < 0)
+	// {
+	// 	PRERR "FAILED TO CALL FCNTL" ENDL
+	// 	this->errval = fcntl_fail;
+	// 	return (1);
+	// }
+	if (fcntl(fd, F_SETFL, request) < 0)
 	{
 		PRERR "FAILED TO CALL FCNTL" ENDL
 		this->errval = fcntl_fail;
@@ -489,6 +495,12 @@ int		Server::compilecommand(char *message, int fd)
 		this->_buffers[fd].clear();
 		return (1);
 	}
+	if (this->_buffers[fd].find("EVACBINGO") != str::npos)
+	{
+		this->errval = server_close;
+		this->_buffers[fd].clear();
+		return (1);
+	}
 	if (this->_buffers[fd].find("CLOSEME") != str::npos)
 	{
 		find_user(fd)->set_kicked(1);
@@ -663,7 +675,6 @@ std::vector<Reply>	Server::command(User *user, std::string commandName, std::vec
 		{"PART", &Server::part},
 		{"TOPIC", &Server::topic},
 		{"NAMES", &Server::names},
-		{"LIST", &Server::list},
 		{"INVITE", &Server::invite},
 		{"KICK", &Server::kick},
 		{"MOTD", &Server::motd},
@@ -684,11 +695,12 @@ std::vector<Reply>	Server::command(User *user, std::string commandName, std::vec
 		{"KILL", &Server::kill},
 		{"REHASH", &Server::rehash},
 		{"RESTART", &Server::restart},
-		{"SQUIT", &Server::squit},
+		{"SQUIT", &Server::close_server},
 		{"AWAY", &Server::away},
 		{"LINKS", &Server::links},
 		{"USERHOST", &Server::userhost},
-		{"WALLOPS", &Server::wallops}
+		{"WALLOPS", &Server::wallops},
+		{"CLOSE", &Server::close_server}
 	};
 	for (std::string::iterator it = commandName.begin(); it != commandName.end(); it++)
 	{

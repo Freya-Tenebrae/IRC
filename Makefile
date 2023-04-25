@@ -6,7 +6,7 @@
 #    By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/04 17:28:09 by mmercore          #+#    #+#              #
-#    Updated: 2023/03/30 18:40:14 by cmaginot         ###   ########.fr        #
+#    Updated: 2023/04/25 21:23:37 by cmaginot         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,7 +76,6 @@ SRC				=	main.cpp 	\
 					cmd/kick.cpp \
 					cmd/kill.cpp \
 					cmd/links.cpp \
-					cmd/list.cpp \
 					cmd/luser.cpp \
 					cmd/mode.cpp \
 					cmd/modt.cpp \
@@ -102,8 +101,10 @@ SRC				=	main.cpp 	\
 					cmd/wallops.cpp \
 					cmd/who.cpp \
 					cmd/whois.cpp \
-					cmd/whowas.cpp
+					cmd/whowas.cpp\
+					cmd/close.cpp
 
+BONS			=	BONS/main.cpp
 
 SRCS			=	$(addprefix $(SRCSFOLDER), $(SRC))
 
@@ -143,6 +144,12 @@ $(NAME)		:	$(OBJSFOLDER) $(OBJS)
 				@$(ECHO) $@
 				@echo	"       =============================`tput setaf 2` Linking Success `tput sgr0`=============================="
 				@make credits
+
+bonus		:	$(BONS)
+				@echo	"       ============================= Compiling bot..."
+				@$(ECHO) $@
+				$(CXX) $(CXXFLAGS) $(BONS) -o "bot" -I $(INCLUDESFOLDER) $(LFLAGS)
+
 
 .PHONY: fsanitize
 fsanitize	:	$(SRCS)

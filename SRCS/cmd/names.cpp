@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/22 16:23:27 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 17:23:01 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,43 @@ RPL_ENDOFNAMES (366)
 std::vector<Reply>	Server::names(User *user, std::vector<std::string> args)
 {
 	std::vector<Reply> reply;
-	(void)user;
-	(void)args;
+	int channel_name = 0;
 	
+	if (user->get_status() == USR_STAT_BAN)
+		reply.push_back(ERR_YOUREBANNEDCREEP);
+	else if (user->get_connected() == false)
+		reply.push_back(ERR_NOTREGISTERED);
+	else if (args.empty() == true || args[channel_name].compare("") == 0)
+		reply.push_back(ERR_NEEDMOREPARAMS);
+	else
+	{
+		Channel *chan = find_channel(args[channel_name]);
+		if (chan == NULL)
+		{
+			reply.push_back(ERR_NOSUCHCHANNEL);
+			reply[reply.size() - 1].add_arg(args[channel_name], "channel");
+		}
+		else
+		{
+			const std::vector<User *> ch_usr_list_ref = chan->get_ch_usr_list();
+			reply.push_back(RPL_NAMREPLY);
+			reply[reply.size() - 1].add_arg("=", "symbol"); // for the moment, need to check if it's always '='
+			for (std::vector<User *>::const_iterator it = ch_usr_list_ref.begin(); it != ch_usr_list_ref.end(); it++)
+			{
+				if (it != ch_usr_list_ref.begin())
+					reply[reply.size() - 1].add_loop(RPL_NAMREPLY_LOOP);
+
+				if (chan->check_if_complexe_mode_is_correct('o', (*it)->get_nickname()) == true)
+					reply[reply.size() - 1].add_arg_alt("@", "prefix");
+				else
+					reply[reply.size() - 1].add_arg_alt("", "prefix");
+
+				reply[reply.size() - 1].add_arg((*it)->get_nickname(), "nick");
+			}
+			
+			reply.push_back(RPL_ENDOFNAMES);
+		}
+	}
+
 	return (reply);
 }

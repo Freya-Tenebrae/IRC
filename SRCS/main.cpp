@@ -6,7 +6,7 @@
 /*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 18:26:22 by mmercore          #+#    #+#             */
-/*   Updated: 2023/04/24 13:46:53 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/04/25 17:55:00 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,17 @@
 int	main(int ac, char **av, char **envp) {
 	(void)ac, (void)av, (void)envp;
 	int restart;
+	int port;
 
+	port = 0;
 	restart = 1;
+	if (ac > 1)
+	{
+		std::string s_port = av[1];
+		std::stringstream strstr;
+		strstr << s_port;
+		strstr >> port;	
+	}
 	while (restart)
 	{
 		if (ac == 1)
@@ -82,12 +91,12 @@ int	main(int ac, char **av, char **envp) {
 		}
 		if (ac == 2)
 		{
-			Server a(atoi(av[1]));
+			Server a(port);
 			restart = a.start();
 		}
 		if (ac == 3)
 		{
-			Server a(atoi(av[1]), av[2]);
+			Server a(port, av[2]);
 			restart = a.start();
 		}		
 	}

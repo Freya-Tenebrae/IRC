@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 16:37:57 by plam              #+#    #+#             */
-/*   Updated: 2023/04/21 19:42:10 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 21:08:28 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ Channel	&Channel::operator=(const Channel &other)
 	{
 		this->_channelmode.insert(std::pair<char, std::string>(it->first, it->second));
 	}
-
+	this->_topic = other._topic;
 	return *this;
 }
 
@@ -98,7 +98,10 @@ void	Channel::del_user(User *user)
 	for (std::vector<User *>::iterator it = _ch_usr_list.begin(); it != _ch_usr_list.end(); it++)
 	{
 		if (*it == user)
-			_ch_usr_list.erase(it);
+		{
+			it = _ch_usr_list.erase(it);
+			break;
+		}
 	}
 }
 
@@ -117,7 +120,7 @@ void	Channel::add_simple_channelmode(const char newMod)
 	this->_channelmode.insert(std::pair<char, std::string>(newMod, ""));
 }
 
-void	Channel::del_simple_usermode(const char oldMod)
+void	Channel::del_simple_channelmode(const char oldMod)
 {
 	for (std::multimap<char, std::string>::iterator it = _channelmode.begin(); it != _channelmode.end(); it++)
 	{
@@ -154,7 +157,7 @@ void	Channel::add_complex_channelmode(const char newMod, const std::string newma
 	this->_channelmode.insert(std::pair<char, std::string>(newMod, newmask));
 }
 
-void	Channel::del_complex_usermode(const char oldMod, const std::string oldmask)
+void	Channel::del_complex_channelmode(const char oldMod, const std::string oldmask)
 {
 	for (std::multimap<char, std::string>::iterator it = _channelmode.begin(); it != _channelmode.end(); it++)
 	{
@@ -173,14 +176,25 @@ bool	Channel::check_if_specific_mode_is_used(const char mod)
 	return (true);
 }
 
-void	Channel::add_complex_channelmode(const char newMod, const int n)
+void	Channel::add_specific_channelmode(const char newMod, const int n)
 {
 	if (newMod == 'l')
 		_number_max_user = n;
 }
 
-void	Channel::del_complex_usermode(const char oldMod)
+void	Channel::del_specific_channelmode(const char oldMod)
 {
 	if (oldMod == 'l')
 		_number_max_user = -1;
+}
+
+
+void	Channel::set_topic(std::string newTopic)
+{
+	this->_topic = newTopic;
+}
+
+const std::string	&Channel::get_topic()
+{
+	return this->_topic;
 }

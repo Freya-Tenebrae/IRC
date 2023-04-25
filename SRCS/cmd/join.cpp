@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/24 20:51:24 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/25 19:41:11 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,8 +107,9 @@ size_t npos = -1;
 
 std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std::string channel_key)
 {
-	std::vector<Reply>	reply, to_send;
-	bool				is_creator = false;
+	std::vector<Reply>			reply, to_send, reply_topic, reply_names;
+	std::vector<std::string>	args_to_topic_and_name;
+	bool						is_creator = false;
 
 	Channel *chan = find_channel(channel_name);
 	if (chan == NULL)
@@ -125,7 +126,7 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 		reply.push_back(ERR_INVITEONLYCHAN);
 	else if (chan->get_number_max_user() != -1 && chan->get_number_act_user() >= chan->get_number_max_user())
 		reply.push_back(ERR_CHANNELISFULL);
-	else if (chan->check_if_complexe_mode_is_used('b') == true && chan->check_if_complexe_mode_is_correct('b', user->get_nickname()) == true) // tmp ban on nickname
+	else if (chan->check_if_complexe_mode_is_used('b') == true && chan->check_if_complexe_mode_is_correct('b', user->get_nickname()) == true && chan->check_if_complexe_mode_is_correct('e', user->get_nickname()) == false) // tmp ban on nickname
 		reply.push_back(ERR_BANNEDFROMCHAN);
 	else
 	{
@@ -135,29 +136,13 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 
 		const std::vector<User *> ch_usr_list_ref = chan->get_ch_usr_list();
 
-		// RPL_TOPIC (332) // maybe later
-		// RPL_TOPICWHOTIME (333) // maybe later
+		args_to_topic_and_name.push_back(channel_name);
+		reply_topic = names(user, args_to_topic_and_name);
+		reply.insert(reply.end(), reply_topic.begin(), reply_topic.end());
+		reply_names = names(user, args_to_topic_and_name);
+		reply.insert(reply.end(), reply_names.begin(), reply_names.end());
 
-		reply.push_back(RPL_NAMREPLY);
-		reply[reply.size() - 1].add_arg(chan->get_name(), "channel");
-		reply[reply.size() - 1].add_arg("=", "symbol"); // for the moment, need to check if it's always '='
-		for (std::vector<User *>::const_iterator it = ch_usr_list_ref.begin(); it != ch_usr_list_ref.end(); it++)
-		{
-			if (it != ch_usr_list_ref.begin())
-				reply[reply.size() - 1].add_loop(RPL_NAMREPLY_LOOP);
-
-			if (chan->check_if_complexe_mode_is_correct('o', (*it)->get_nickname()) == true)
-				reply[reply.size() - 1].add_arg_alt("@", "prefix");
-			else
-				reply[reply.size() - 1].add_arg_alt("", "prefix");
-
-			reply[reply.size() - 1].add_arg((*it)->get_nickname(), "nick");
-		}
-		
-		reply.push_back(RPL_ENDOFNAMES);
-		reply[reply.size() - 1].add_arg(chan->get_name(), "channel");
 		reply.push_back(MGS_JOIN);
-		reply[reply.size() - 1].add_arg(chan->get_name(), "channel");
 
 		to_send.push_back(MGS_JOIN);
 		to_send[0].add_user(user);
@@ -174,6 +159,7 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
 	{
 		it->add_user(user);
+		it->add_arg(chan->get_name(), "channel");
 		it->prep_to_send(1);
 	}
 	return reply;

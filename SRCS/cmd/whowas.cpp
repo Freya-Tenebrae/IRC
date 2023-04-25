@@ -6,7 +6,7 @@
 /*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/24 16:58:49 by plam             ###   ########.fr       */
+/*   Updated: 2023/04/25 16:53:06 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,26 +60,33 @@ Reply Examples:
 std::vector<Reply>	Server::whowas(User *user, std::vector<std::string> args)
 {
 	std::vector<Reply> reply;
-	(void)user;
-	(void)args;
-	if (args.size() == 1 || (args.size() == 2 && (args[0].compare(this->_name) || args[0] == args[1])))
+	(void)user;										// get rid of this to make it work
+	(void)args;										// get rid of this to make it work
+	if (args.size() == 1 || (args.size() == 2))
 	{
 		if (args[0].empty() == false)
 		{
-			for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
+			for (std::vector<User *>::iterator it_usr = _usr_list.end(); it_usr != _usr_list.begin(); it_usr--)
 			{
 				if ((*it_usr)->get_nickname().compare(args[0]))
 				{
-					reply.push_back(RPL_WHOREPLY);
-					reply[reply.size()-1].add_arg("channel to do", "channel");
+					reply.push_back(RPL_WHOWASUSER);
 					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "user");
 				}
-				break ;
+				else
+				{
+					reply.push_back(ERR_WASNOSUCHNICK);
+					break ;
+				}
 			}
+			reply.push_back(RPL_WHOISSERVER);
+			reply.push_back(RPL_WHOISACTUALLY);
 		}
+		else
+			reply.push_back(ERR_NONICKNAMEGIVEN);
 	}
 	else
-		reply.push_back(ERR_NOSUCHSERVER);
+		reply.push_back(ERR_NEEDMOREPARAMS);
 	reply.push_back(RPL_ENDOFWHOWAS);
 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
 	{

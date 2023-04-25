@@ -6,7 +6,7 @@
 /*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/24 16:57:40 by plam             ###   ########.fr       */
+/*   Updated: 2023/04/25 16:53:36 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,21 +109,72 @@ Reply Example:
 std::vector<Reply>	Server::whois(User *user, std::vector<std::string> args)
 {
 	std::vector<Reply> reply;
-	(void)user;
-	(void)args;
+	(void)user;							// get rid of this to make it work
+	(void)args;							// get rid of this to make it work
 	if (args.size() == 1)
 	{
-		if (args[0].empty() == false) 
+		if (args[0].empty() == false)
 		{
 			for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
 			{
 				if ((*it_usr)->get_nickname().compare(args[0]))
 				{
-					reply.push_back(RPL_WHOREPLY);
+					reply.push_back(RPL_WHOISUSER);
 					reply[reply.size()-1].add_arg("channel to do", "channel");
-					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "user");
+					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "is logged in as");
 				}
 				break ;
+			}
+		}
+		else
+			reply.push_back(ERR_NONICKNAMEGIVEN);
+	}
+	else if (args.size() == 2) 
+	{
+		if (args[0].empty() == false && (args[0].compare(this->get_name()) || args[0] == args[1]))
+		{
+			for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
+			{
+				if ((*it_usr)->get_nickname().compare(args[0]))
+				{
+					reply.push_back(RPL_WHOISUSER);
+					reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "is logged in as");
+				}
+			}
+			if (user->check_if_mode_is_used('o') == true)
+			{
+				reply.push_back(RPL_WHOISCERTFP);
+				reply.push_back(RPL_WHOISREGNICK);
+				reply.push_back(RPL_WHOISSERVER);
+				reply.push_back(RPL_WHOISOPERATOR);
+				reply.push_back(RPL_WHOISCHANNELS);
+				if (args[0][0] == '#')
+				{
+					args[0].erase(0, 1);
+					for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
+					{
+						if ((*it)->get_name().compare(args[0]))
+							reply[reply.size()-1].add_arg((*it)->get_name(), "channel");
+					}
+				}
+				else if (args[0] == args[1])
+				{
+					for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
+					{
+						const std::vector<User *> ch_usr_list_ref = (*it)->get_ch_usr_list();
+						for (std::vector<User *>::const_iterator it_usr = ch_usr_list_ref.begin(); it_usr != ch_usr_list_ref.end(); it_usr++)
+							if ((*it_usr)->get_nickname() == args[1])
+								reply[reply.size()-1].add_arg((*it)->get_name(), " ");
+					}
+				}
+				//reply.push_back(RPL_WHOISSPECIAL);
+				reply.push_back(RPL_WHOISACCOUNT);
+				reply.push_back(RPL_WHOISACTUALLY);
+				reply.push_back(RPL_WHOISHOST);
+				reply.push_back(RPL_WHOISMODES);
+				reply.push_back(RPL_WHOISSECURE);
+				reply.push_back(RPL_WHOISIDLE);
+				reply.push_back(RPL_AWAY);
 			}
 		}
 	}
