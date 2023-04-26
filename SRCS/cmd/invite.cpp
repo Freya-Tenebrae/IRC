@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   invite.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 20:45:40 by plam             ###   ########.fr       */
+/*   Updated: 2023/04/26 13:36:43 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ static bool user_is_on_channel(Channel *chan, User *user)
 
 std::vector<Reply>	Server::invite(User *user, std::vector<std::string> args)
 {
-	std::vector<Reply>	reply;
+	std::vector<Reply>	reply, to_send;
 	
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
@@ -83,38 +83,85 @@ std::vector<Reply>	Server::invite(User *user, std::vector<std::string> args)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[0].compare("") == 0 || args.size() < 2 || args[1].compare("") == 0)
 		reply.push_back(ERR_NEEDMOREPARAMS);
+	else if (channel_exist(this, args[1]) == false)
+	{
+		reply.push_back(ERR_NOSUCHCHANNEL);
+		reply[reply.size() - 1].add_arg(args[1], "channel");
+	}
 	else
 	{
-		if (channel_exist(this, args[1]))
+		Channel	*chan = find_channel(args[1]);
+		if (user_is_on_channel(chan, user) == false)
 		{
-			Channel	*chan = find_channel(args[0]);
-			if (user_is_on_channel(chan, user))
+			reply.push_back(ERR_NOTONCHANNEL);
+			reply[reply.size() - 1].add_arg(args[1], "channel");
+		}
+		else
+		{
+			User *target = find_user_by_nickname(args[0]);
+			if (target == NULL)
+			{
+				reply.push_back(ERR_NOSUCHNICK);
+				reply[reply.size() - 1].add_arg(args[0], "nickname");
+			}
+			else
 			{
 				if (chan->check_if_simple_mode_is_used('i') == true)
 				{
 					if (user->check_if_mode_is_used('I') == true || user->check_if_mode_is_used('o') == true)	// only channel operator can invite a user on a invite only channel
 					{
-						if (user_is_on_channel(chan, find_user_by_nickname(args[0])))
-							reply.push_back(ERR_USERONCHANNEL);
-						else
-							reply.push_back(RPL_INVITING);
+						reply.push_back(ERR_CHANOPRIVSNEEDED);
+						reply[reply.size() - 1].add_arg(args[1], "channel");
 					}
 					else
-						reply.push_back(ERR_CHANOPRIVSNEEDED);
+					{
+						if (user_is_on_channel(chan, target) == true)
+						{
+							reply.push_back(ERR_USERONCHANNEL);
+							reply[reply.size() - 1].add_arg(args[0], "nick");
+							reply[reply.size() - 1].add_arg(args[1], "channel");
+						}
+						else
+						{
+							chan->add_complex_channelmode('I', args[0]);
+							reply.push_back(RPL_INVITING);
+							reply[reply.size() - 1].add_arg(args[0], "nick");
+							reply[reply.size() - 1].add_arg(args[1], "channel");
+
+							to_send.push_back(MGS_INVITE);
+							to_send[0].add_arg(args[0], "nick");
+							to_send[0].add_arg(args[1], "channel");
+							to_send[0].add_user(user);
+							to_send[0].prep_to_send(1);
+							send_message(target, to_send[0].get_message());
+						}
+					}
 				}
 				else
 				{
-					if (user_is_on_channel(chan, find_user_by_nickname(args[0])))
+					if (user_is_on_channel(chan, target) == true)
+					{
 						reply.push_back(ERR_USERONCHANNEL);
+						reply[reply.size() - 1].add_arg(args[0], "nick");
+						reply[reply.size() - 1].add_arg(args[1], "channel");
+					}
 					else
+					{
+						chan->add_complex_channelmode('I', args[0]);
 						reply.push_back(RPL_INVITING);
+						reply[reply.size() - 1].add_arg(args[0], "nick");
+						reply[reply.size() - 1].add_arg(args[1], "channel");
+						
+						to_send.push_back(MGS_INVITE);
+						to_send[0].add_arg(args[0], "nick");
+						to_send[0].add_arg(args[1], "channel");
+						to_send[0].add_user(user);
+						to_send[0].prep_to_send(1);
+						send_message(target, to_send[0].get_message());
+					}
 				}
 			}
-			else
-				reply.push_back(ERR_NOTONCHANNEL);
 		}
-		else
-			reply.push_back(ERR_NOSUCHCHANNEL);
 	}
 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/04/25 21:22:25 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/26 18:42:01 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -341,7 +341,24 @@ int		Server::polling_loop()
 					// On verifie si on est prets a accepter une nouvelle connection
 					do
 					{
-						new_fd = accept(get_socketfd(),0 , 0);
+						if (fd_counter < MAX_USERS)
+						{
+							new_fd = accept(get_socketfd(),0 , 0);
+						}
+						else
+						{
+							new_fd = accept(get_socketfd(),0 , 0);
+							if (new_fd < 0)
+							{
+								if (errno != EWOULDBLOCK)
+									this->errval = accept_fail;
+								break;
+							}
+							send(new_fd, "Server is full.\n", sizeof(char) * 15, MSG_DONTWAIT);
+							close(new_fd);
+							new_fd = -1;
+							break;
+						}
 						// Errors
 						if (new_fd < 0)
 						{

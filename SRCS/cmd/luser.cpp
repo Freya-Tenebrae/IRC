@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/28 17:51:21 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/26 14:19:59 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ RPL_GLOBALUSERS (266)
 
 std::vector<Reply>	Server::lusers(User *user, std::vector<std::string> args)
 {
-	(void)args;
-
 	std::vector<Reply> reply;
+
+	(void)args;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);

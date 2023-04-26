@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 19:41:11 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/26 14:05:28 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 		// ERR_TOOMANYCHANNELS (405) // not use (maybe)
 	if (chan->check_if_complexe_mode_is_used('k') && chan->check_if_complexe_mode_is_correct('k', channel_key) == false)
 		reply.push_back(ERR_BADCHANNELKEY);
-	else if (chan->check_if_simple_mode_is_used('i') == true)
+	else if (chan->check_if_simple_mode_is_used('i') == true && chan->check_if_complexe_mode_is_correct('I', user->get_nickname()) == false)
 		reply.push_back(ERR_INVITEONLYCHAN);
 	else if (chan->get_number_max_user() != -1 && chan->get_number_act_user() >= chan->get_number_max_user())
 		reply.push_back(ERR_CHANNELISFULL);
@@ -137,10 +137,8 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 		const std::vector<User *> ch_usr_list_ref = chan->get_ch_usr_list();
 
 		args_to_topic_and_name.push_back(channel_name);
-		reply_topic = names(user, args_to_topic_and_name);
-		reply.insert(reply.end(), reply_topic.begin(), reply_topic.end());
+		reply_topic = topic(user, args_to_topic_and_name);
 		reply_names = names(user, args_to_topic_and_name);
-		reply.insert(reply.end(), reply_names.begin(), reply_names.end());
 
 		reply.push_back(MGS_JOIN);
 
@@ -162,7 +160,9 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 		it->add_arg(chan->get_name(), "channel");
 		it->prep_to_send(1);
 	}
-	return reply;
+	reply.insert(reply.end(), reply_topic.begin(), reply_topic.end());
+	reply.insert(reply.end(), reply_names.begin(), reply_names.end());
+	return (reply);
 }
 
 std::vector<Reply> Server::join(User *user, std::vector<std::string> args)

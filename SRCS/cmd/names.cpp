@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 17:23:01 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/26 14:07:48 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ std::vector<Reply>	Server::names(User *user, std::vector<std::string> args)
 			const std::vector<User *> ch_usr_list_ref = chan->get_ch_usr_list();
 			reply.push_back(RPL_NAMREPLY);
 			reply[reply.size() - 1].add_arg("=", "symbol"); // for the moment, need to check if it's always '='
+			reply[reply.size() - 1].add_arg(args[channel_name], "channel");
 			for (std::vector<User *>::const_iterator it = ch_usr_list_ref.begin(); it != ch_usr_list_ref.end(); it++)
 			{
 				if (it != ch_usr_list_ref.begin())
@@ -68,7 +69,14 @@ std::vector<Reply>	Server::names(User *user, std::vector<std::string> args)
 			}
 			
 			reply.push_back(RPL_ENDOFNAMES);
+			reply[reply.size() - 1].add_arg(args[channel_name], "channel");
 		}
+	}
+
+	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+	{
+		it->add_user(user);
+		it->prep_to_send(1);
 	}
 
 	return (reply);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   topic.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 19:59:49 by plam             ###   ########.fr       */
+/*   Updated: 2023/04/26 13:48:13 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ static bool user_is_on_channel(Channel *chan, User *user)
 
 std::vector<Reply>	Server::topic(User *user, std::vector<std::string> args)
 {
-	std::vector<Reply> reply;
+	std::vector<Reply> reply, to_send;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
@@ -90,55 +90,64 @@ std::vector<Reply>	Server::topic(User *user, std::vector<std::string> args)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[0].compare("") == 0)
 		reply.push_back(ERR_NEEDMOREPARAMS);
+	else if (channel_exist(this, args[0]) == false)
+	{
+		reply.push_back(ERR_NOSUCHCHANNEL);
+		reply[reply.size() - 1].add_arg(args[0], "channel");
+	}
 	else
 	{
-		if (args.size() == 1 && args[0][0] == '#')
+		Channel	*chan = find_channel(args[0]);
+		if (user_is_on_channel(chan, user) == false)
 		{
-			if (channel_exist(this, args[0]))
-			{
-				Channel	*chan = find_channel(args[0]);
-				if (user_is_on_channel(chan, user) == true)			//verify if the static function work correctly
-				{
-					if (chan->get_topic().empty() == false)
-					{
-						reply.push_back(RPL_TOPIC);
-						reply[reply.size()-1].add_arg(chan->get_topic(), "topic");
-					}
-					else
-						reply.push_back(RPL_NOTOPIC);
-				}
-				else
-					reply.push_back(ERR_NOTONCHANNEL);
-			}
-			else
-				reply.push_back(ERR_NOSUCHCHANNEL);
-		}
-		else if (args.size() == 2 && args[0][0] == '#')
-		{
-			if (channel_exist(this, args[0]))
-			{
-				Channel	*chan = find_channel(args[0]);
-				if (user_is_on_channel(chan, user) == true)			//verify if the static function work correctly
-				{
-					if (chan->check_if_simple_mode_is_used('t') == true)		// see if operators are the only users that can change the topic in the server
-					{
-						if (user->check_if_mode_is_used('o') == true || user->check_if_mode_is_used('v'))		// only channel operator can change the topic of a channel
-						{
-							chan->set_topic(args[1]);
-							reply.push_back(RPL_TOPIC);
-						}
-					}
-					else
-						reply.push_back(ERR_CHANOPRIVSNEEDED);
-				}
-				else
-					reply.push_back(ERR_NOTONCHANNEL);
-			}
-			else
-				reply.push_back(ERR_NOSUCHCHANNEL);
+			reply.push_back(ERR_NOTONCHANNEL);
+			reply[reply.size() - 1].add_arg(args[0], "channel");
 		}
 		else
-			reply.push_back(ERR_NOSUCHCHANNEL);
+		{
+			if (args.size() == 1)
+			{
+				if (chan->get_topic().empty() == true)
+				{
+					reply.push_back(RPL_NOTOPIC);
+					reply[reply.size() - 1].add_arg(args[0], "channel");
+				}
+				else
+				{
+					reply.push_back(RPL_TOPIC);
+					reply[reply.size() - 1].add_arg(args[0], "channel");
+					reply[reply.size()-1].add_arg(chan->get_topic(), "topic");
+				}
+			}
+			else
+			{
+				if (chan->check_if_simple_mode_is_used('t') == true && chan->check_if_complexe_mode_is_correct('o', user->get_nickname()) == false && \
+					chan->check_if_complexe_mode_is_correct('v', user->get_nickname()) == false)
+				{
+					reply.push_back(ERR_CHANOPRIVSNEEDED);
+					reply[reply.size() - 1].add_arg(args[0], "channel");
+				}
+				else
+				{
+					std::string new_topic = "";
+					for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); it++)
+					{
+						new_topic.append(" ");
+						new_topic.append(*it);
+					}
+					new_topic.erase(0, 2);
+					chan->set_topic(new_topic);
+
+					to_send.push_back(RPL_TOPIC);
+					to_send[0].add_arg(args[0], "channel");
+					to_send[0].add_arg(chan->get_topic(), "topic");
+					to_send[0].add_user(user);
+					to_send[0].prep_to_send(1);
+					for (std::vector<User *>::const_iterator it_usr = chan->get_ch_usr_list().begin(); it_usr != chan->get_ch_usr_list().end(); it_usr++)
+						send_message(*it_usr, to_send[0].get_message());
+				}
+			}
+		}
 	}
 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
 	{

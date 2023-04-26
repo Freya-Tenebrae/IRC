@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 17:32:30 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 20:04:05 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/26 13:16:44 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,6 +196,7 @@ class Reply
 #define RPL_NICKSET Reply(0, "NICK :<client>\n")
 #define MGS_WALLOP Reply(0, "WALLOP <message>\n")
 #define MGS_JOIN Reply(0, "JOIN :<channel>\n")
+#define MGS_INVITE Reply(0, "INVITE <nick> <channel>\n")
 #define MSG_PRIVMSG Reply(0, "PRIVMSG <channel_or_client> :<message>\n")
 #define MSG_NOTICE Reply(0, "NOTICE <channel_or_client> :<message>\n")
 #define MSG_PART Reply(0, "PART <channel> :<message>\n")

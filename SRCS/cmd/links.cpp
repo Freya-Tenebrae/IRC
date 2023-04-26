@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/28 17:08:56 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/04/26 14:19:48 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@ RPL_ENDOFLINKS (365)
 
 std::vector<Reply>	Server::links(User *user, std::vector<std::string> args)
 {
-	(void)args;
-
 	std::vector<Reply> reply;
+
+	(void)args;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
