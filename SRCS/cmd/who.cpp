@@ -6,7 +6,7 @@
 /*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 15:10:13 by plam             ###   ########.fr       */
+/*   Updated: 2023/04/26 18:05:43 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,11 @@ std::vector<Reply>	Server::who(User *user, std::vector<std::string> args)
 						{
 							reply.push_back(RPL_WHOREPLY);
 							reply[reply.size()-1].add_arg((*it)->get_name(), "channel");
-							reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "user");
+							reply[reply.size()-1].add_arg((*it_usr)->get_username(), "user");
+							reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "host");
+							reply[reply.size()-1].add_arg(this->get_name(), "server");
+							reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+							reply[reply.size()-1].add_arg((*it_usr)->get_usermode(), "flags");
 						}
 						break ;
 					}
@@ -92,7 +96,11 @@ std::vector<Reply>	Server::who(User *user, std::vector<std::string> args)
 					if ((*it_usr)->get_nickname().compare(args[0]))
 					{
 						reply.push_back(RPL_WHOREPLY);
-						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "user");
+						reply[reply.size()-1].add_arg((*it_usr)->get_username(), "user");
+						reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "host");
+						reply[reply.size()-1].add_arg(this->get_name(), "server");
+						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+						reply[reply.size()-1].add_arg((*it_usr)->get_usermode(), "flags");
 					}
 					break ;
 				}
