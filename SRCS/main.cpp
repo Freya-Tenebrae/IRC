@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 18:26:22 by mmercore          #+#    #+#             */
-/*   Updated: 2023/04/25 17:55:00 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/05/09 15:50:51 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,48 +25,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #define PORT 8080
-// int main(int argc, char const* argv[])
-// {
-// 	(void)argv;
-// 	(void)argc;
-//     int server_fd, new_socket = 0;
-//     struct sockaddr_in address;
-//     int opt = 1;
-//     str hello = "Hello from server";
- 
-// 	perror("funni");
-//     // Creating socket file descriptor
-//     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-//         perror("socket failed");
-//         exit(EXIT_FAILURE);
-//     }
- 
-//     // Forcefully attaching socket to the port 8080
-//     if (setsockopt(server_fd, SOL_SOCKET,
-//                    SO_REUSEADDR | SO_REUSEPORT, &opt,
-//                    sizeof(opt))) {
-//         perror("setsockopt");
-//         exit(EXIT_FAILURE);
-//     }
-//     address.sin_family = AF_INET;
-//     address.sin_addr.s_addr = INADDR_ANY;
-//     address.sin_port = htons(PORT);
- 
-//     // Forcefully attaching socket to the port 8080
-//     if (bind(server_fd, (struct sockaddr*)&address,
-//              sizeof(address))
-//         < 0) {
-//         perror("bind failed");
-//         exit(EXIT_FAILURE);
-//     }
-
- 
-//     // closing the connected socket
-//     close(new_socket);
-//     // closing the listening socket
-//     shutdown(server_fd, SHUT_RDWR);
-//     return 0;
-// }
 
 int	main(int ac, char **av, char **envp) {
 	(void)ac, (void)av, (void)envp;
@@ -100,25 +58,5 @@ int	main(int ac, char **av, char **envp) {
 			restart = a.start();
 		}		
 	}
-
-	
-	//while(1);
-	// struct pollfd	fds[1];
-	// fds[0].fd = 0;
-	// fds[0].events = POLLIN;
-
-	// Server a;
-	// while (true) {
-	// 	int	ret = poll(fds, 1, -1);
-	// 	if	(ret == -1) {
-	// 		std::cerr << "poll() error" << std::endl;
-	// 		return 1;
-	// 	}
-	// 	if (fds[0].revents & POLLIN) {
-	// 		char	buf[1024];
-	// 		std::cin.getline(buf, sizeof(buf));
-	// 		std::cout << "input: " << buf << std::endl;
-	// 	}
-	// }
 	return (0);
 }

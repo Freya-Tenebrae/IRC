@@ -6,7 +6,7 @@
 /*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 16:53:06 by plam             ###   ########.fr       */
+/*   Updated: 2023/05/11 17:20:14 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ Reply Examples:
 
 std::vector<Reply>	Server::whowas(User *user, std::vector<std::string> args)
 {
+	int	nick = 0;
 	std::vector<Reply> reply;
 	(void)user;										// get rid of this to make it work
 	(void)args;										// get rid of this to make it work
@@ -71,16 +72,27 @@ std::vector<Reply>	Server::whowas(User *user, std::vector<std::string> args)
 				if ((*it_usr)->get_nickname().compare(args[0]))
 				{
 					reply.push_back(RPL_WHOWASUSER);
-					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "user");
+					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+					reply[reply.size()-1].add_arg((*it_usr)->get_username(), "user");
+					reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "host");
+					reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "real");
 				}
 				else
 				{
 					reply.push_back(ERR_WASNOSUCHNICK);
 					break ;
 				}
+				reply.push_back(RPL_WHOISSERVER);
+				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
+				reply[reply.size()-1].add_arg(this->get_name(), "server");
+				reply[reply.size()-1].add_arg(this->get_version(), "server info");
+
+				reply.push_back(RPL_WHOISACTUALLY);
+				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+				reply[reply.size()-1].add_arg((*it_usr)->get_username(), "user");
+				reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "host");
+				reply[reply.size()-1].add_arg((*it_usr)->get_hostaddr(), "ip"); // temporary, not sure for it
 			}
-			reply.push_back(RPL_WHOISSERVER);
-			reply.push_back(RPL_WHOISACTUALLY);
 		}
 		else
 			reply.push_back(ERR_NONICKNAMEGIVEN);
@@ -88,6 +100,7 @@ std::vector<Reply>	Server::whowas(User *user, std::vector<std::string> args)
 	else
 		reply.push_back(ERR_NEEDMOREPARAMS);
 	reply.push_back(RPL_ENDOFWHOWAS);
+	reply[reply.size()-1].add_arg(args[nick], "");
 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
 	{
 		it->add_user(user);

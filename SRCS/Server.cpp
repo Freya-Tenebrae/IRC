@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/04/26 18:42:01 by plam             ###   ########.fr       */
+/*   Updated: 2023/05/15 16:33:10 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -378,7 +378,7 @@ int		Server::polling_loop()
 							u->set_hostname("localhost");
 							u->set_hostaddr("127.0.0.1");
 							_usr_list.push_back(u);
-
+							this->_buffers[fd_counter].clear();
 							fd_counter++;
 						}
 					}
@@ -662,14 +662,14 @@ void	Server::send_message(const User *user, std::string message)
 		send(user->get_fd(), message.c_str(), message.length(), 0);
 		message.erase(message.begin() + message.size() - 1);
 		message.insert(0, " ");
-		if (user != NULL) // for log only
-		{
-			message.insert(0, user->get_hostaddr());
-			message.insert(0, "@");
-			message.insert(0, user->get_username());
-			message.insert(0, "!");
-			message.insert(0, user->get_nickname());
-		}
+		// if (user != NULL) // for log only
+		// {
+		// 	message.insert(0, user->get_hostaddr());
+		// 	message.insert(0, "@");
+		// 	message.insert(0, user->get_username());
+		// 	message.insert(0, "!");
+		// 	message.insert(0, user->get_nickname());
+		// }
 		std::cout << "\033[1;35m" << user->get_fd() << " -> \033[1;36m|\033[0m";
 		std::cout << message << "\033[1;36m|\033[0m" << std::endl;
 		// push all rpls on file named log instead of cout

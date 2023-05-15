@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   who.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/26 18:05:43 by plam             ###   ########.fr       */
+/*   Updated: 2023/05/09 16:29:15 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,14 +62,15 @@ Reply Examples:
 
 std::vector<Reply>	Server::who(User *user, std::vector<std::string> args)
 {
+	int mask = 0;
 	std::vector<Reply> reply;
 	if (args.size() == 1)
 	{
-		if (args[0].empty() == false) 
+		if (args[mask].empty() == false) 
 		{
-			if (args[0][0] == '#')
+			if (args[mask][0] == '#')
 			{
-				args[0].erase(0, 1);
+				args[mask].erase(0, 1);
 				for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
 				{
 					if ((*it)->get_name().compare(args[0]))
@@ -78,12 +79,15 @@ std::vector<Reply>	Server::who(User *user, std::vector<std::string> args)
 						for (std::vector<User *>::const_iterator it_usr = ch_usr_list_ref.begin(); it_usr != ch_usr_list_ref.end(); it_usr++)
 						{
 							reply.push_back(RPL_WHOREPLY);
+							reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "client");
 							reply[reply.size()-1].add_arg((*it)->get_name(), "channel");
-							reply[reply.size()-1].add_arg((*it_usr)->get_username(), "user");
+							reply[reply.size()-1].add_arg((*it_usr)->get_username(), "username");
 							reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "host");
 							reply[reply.size()-1].add_arg(this->get_name(), "server");
 							reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
 							reply[reply.size()-1].add_arg((*it_usr)->get_usermode(), "flags");
+							reply[reply.size()-1].add_arg("0", "hopcount");
+							reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "realname");
 						}
 						break ;
 					}
@@ -96,11 +100,15 @@ std::vector<Reply>	Server::who(User *user, std::vector<std::string> args)
 					if ((*it_usr)->get_nickname().compare(args[0]))
 					{
 						reply.push_back(RPL_WHOREPLY);
-						reply[reply.size()-1].add_arg((*it_usr)->get_username(), "user");
-						reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "host");
-						reply[reply.size()-1].add_arg(this->get_name(), "server");
-						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
-						reply[reply.size()-1].add_arg((*it_usr)->get_usermode(), "flags");
+							reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "client");
+							reply[reply.size()-1].add_arg("", "channel");
+							reply[reply.size()-1].add_arg((*it_usr)->get_username(), "username");
+							reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "host");
+							reply[reply.size()-1].add_arg(this->get_name(), "server");
+							reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+							reply[reply.size()-1].add_arg((*it_usr)->get_usermode(), "flags");
+							reply[reply.size()-1].add_arg("0", "hopcount");
+							reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "realname");
 					}
 					break ;
 				}
@@ -109,6 +117,7 @@ std::vector<Reply>	Server::who(User *user, std::vector<std::string> args)
 		else
 			reply.push_back(ERR_NOSUCHSERVER);
 		reply.push_back(RPL_ENDOFWHO);
+		reply[reply.size()-1].add_arg(args[mask], "mask");
 	}
 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
 	{

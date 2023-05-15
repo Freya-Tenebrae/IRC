@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 17:32:30 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/26 13:16:44 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/15 16:16:44 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,6 +200,7 @@ class Reply
 #define MSG_PRIVMSG Reply(0, "PRIVMSG <channel_or_client> :<message>\n")
 #define MSG_NOTICE Reply(0, "NOTICE <channel_or_client> :<message>\n")
 #define MSG_PART Reply(0, "PART <channel> :<message>\n")
+#define MSG_KICK Reply(0, "KICK <channel> <nick> :<message>\n")
 
 #define ERR_ERROSAMENICKNAME Reply(434, "<client> :you already use this nickname\n")
 

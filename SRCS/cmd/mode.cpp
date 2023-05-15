@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 18:05:24 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/15 17:45:45 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,16 @@ given list.
 
 */
 
+static bool user_is_on_channel(Channel *chan, User *user)
+{
+	for (std::vector<User *>::const_iterator it = chan->get_ch_usr_list().begin(); it != chan->get_ch_usr_list().end(); it++)
+	{
+		if (*it == user)
+			return (true);
+	}
+	return (false);
+}
+
 static bool channel_exist(Server *server, std::string target)
 {
 	Channel *chan = server->find_channel(target);
@@ -120,7 +130,7 @@ static bool modestring_valid(std::string modestring)
 		return (false);
 	for (std::string::iterator it = modestring.begin() + 1; it != modestring.end(); it++)
 	{
-		if (!(*it >= 'a' && *it <= 'z') || (*it >= 'A' && *it <= 'Z'))
+		if (!((*it >= 'a' && *it <= 'z') || (*it >= 'A' && *it <= 'Z')))
 			return (false);
 	}
 	return (true);
@@ -143,6 +153,8 @@ static void	reply_channel_mode(Channel *chan, std::vector<std::string> &args, st
 		reply[reply.size() - 1].add_arg(m_args, "mode arguments");
 	}
 
+
+	// rely a faire :
 	// RPL_BANLIST
 	// RPL_ENDOFBANLIST
 	// RPL_EXCEPTLIST
@@ -151,7 +163,28 @@ static void	reply_channel_mode(Channel *chan, std::vector<std::string> &args, st
 	// RPL_ENDOFINVITELIST
 }
 
-static void	apply_mode_on_channel(Channel *chan, std::vector<std::string> &args, std::vector<Reply> &reply)
+static void kick_after_ban(Server *serv, User *user, Channel *chan, std::string mask)
+{
+	std::vector<Reply> to_send;
+	User *usr = serv->find_user_by_nickname(mask);
+
+	if (user_is_on_channel(chan, usr) == true)
+	{
+		to_send.push_back(MSG_KICK);
+		to_send[0].add_user(user);
+		to_send[0].add_arg(chan->get_name(), "channel");
+		to_send[0].add_arg(mask, "nick");
+		to_send[0].add_arg("you are banned from this channel", "message");
+		to_send[0].prep_to_send(1);
+
+		for (std::vector<User *>::const_iterator it_usr = chan->get_ch_usr_list().begin(); it_usr != chan->get_ch_usr_list().end(); it_usr++)
+			serv->send_message(*it_usr, to_send[0].get_message());
+
+		chan->del_user(usr);
+	}
+}
+
+static void	apply_mode_on_channel(Server *serv, User *user, Channel *chan, std::vector<std::string> &args, std::vector<Reply> &reply)
 {
 	int		argument_ptr = 1;
 	int		modestring = 1;
@@ -184,7 +217,11 @@ static void	apply_mode_on_channel(Channel *chan, std::vector<std::string> &args,
 			{
 				std::string mask = args[modestring + argument_ptr++];
 				if (is_addition == true && chan->check_if_complexe_mode_is_correct(*it, mask) == false)
+				{
 					chan->add_complex_channelmode(*it, mask);
+					if (*it == 'b' && chan->check_if_complexe_mode_is_correct('e', mask) == false)
+						kick_after_ban(serv, user, chan, mask);
+				}
 				else if (is_addition == false && chan->check_if_complexe_mode_is_correct(*it, mask) == true)
 					chan->del_complex_channelmode(*it, mask);
 			}
@@ -273,7 +310,7 @@ std::vector<Reply>	Server::mode(User *user, std::vector<std::string> args)
 						reply[reply.size() - 1].add_arg(args[target], "channel");
 					}
 					else
-						apply_mode_on_channel(chan, args, reply);
+						apply_mode_on_channel(this, user, chan, args, reply);
 				}
 			}
 		}

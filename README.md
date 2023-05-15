@@ -1,4 +1,12 @@
-# ft_irc
-A C++98 project to recreate a terminal-based IRC (Internet Relay Chat) client for 42.
-Sources for the project : https://www.linode.com/docs/guides/using-irssi-for-internet-relay-chat/
-                          https://irssi.org/
+# commandes :
+- check or delete whois.cpp
+- check or delete whowas.cpp
+- faire kick.cpp
+
+# bugs :
+lors de proccessus en pause, message qui se dupliquent ... a check
+check la protection n_max sur le serveur (fait ou non ?)
+
+
+# finir bot :
+...

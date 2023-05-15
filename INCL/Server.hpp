@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 21:22:15 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/15 17:48:07 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # define NEW_CONNECTION_MESSAGE "You have connected to FT_IRC\n"
 # define VERSION "0.3"
 # define CRLF "\r"
-# define MAX_USERS 100
+# define MAX_USERS 5 // The server also counts as a user
 
 typedef struct	e_sock_conf {
 //	void			socket_params;
@@ -222,8 +222,8 @@ class Server {
 		//https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html
 		// Equivalent a struct sockaddr* en cast, supporte plus d'implementations
 		ssocki	_address;
-		spollfd	fds[MAX_USERS];
-		str		_buffers[MAX_USERS];
+		spollfd	fds[MAX_USERS + 3];
+		str		_buffers[MAX_USERS + 3];
 		
 };
 

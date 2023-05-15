@@ -1,0 +1,65 @@
+==3162984== Memcheck, a memory error detector
+==3162984== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==3162984== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==3162984== Command: ./ft_irc 8080
+==3162984== 
+FCNTL HAPPENED AND SUCCESS
+SETSOCKOPT HAPPENED AND ERRVAL 0
+SUCCESS BIND
+BIND SUCCESS
+LISTEN SUCCESS
+Polling...
+revents for fd 0 out of 1 is 
+[31mNEW CONNECTION HIHI[0m
+[31mNew fd is now [0m4e are at 0 Out of 1
+revents for fd 1 out of 2 is 
+Doin a skippy on fd 1 out of 2
+Polling...
+revents for fd 0 out of 2 is 
+Doin a skippy on fd 0 out of 2
+revents for fd 1 out of 2 is 
+TEST
+READ
+[31mCurrent value of recv_ret[0m4
+[31mReceived this :
+<<hii
+>>[0m
+BTW JE CRASHE EN RECEVANT MESSAGE
+hii
+ Et fd: 4
+Message size  hii
+
+Message not ready yet
+READ
+Polling...
+revents for fd 0 out of 2 is 
+revents for fd 1 out of 2 is 
+Doin a skippy on fd 1 out of 2
+Polling...
+revents for fd 0 out of 2 is 
+revents for fd 1 out of 2 is 
+Doin a skippy on fd 1 out of 2
+Polling...
+revents for fd 0 out of 2 is 
+Doin a skippy on fd 0 out of 2
+revents for fd 1 out of 2 is 
+TEST
+READ
+[31mCurrent value of recv_ret[0m10
+[31mReceived this :
+<<EVACBINGO
+>>[0m
+BTW JE CRASHE EN RECEVANT MESSAGE
+EVACBINGO
+ Et fd: 4
+READ
+ERREURS ET CLOSE
+==3162984== 
+==3162984== HEAP SUMMARY:
+==3162984==     in use at exit: 0 bytes in 0 blocks
+==3162984==   total heap usage: 99 allocs, 99 frees, 84,347 bytes allocated
+==3162984== 
+==3162984== All heap blocks were freed -- no leaks are possible
+==3162984== 
+==3162984== For lists of detected and suppressed errors, rerun with: -s
+==3162984== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
