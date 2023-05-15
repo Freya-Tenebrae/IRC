@@ -1,12 +1,4 @@
-# commandes :
-- check or delete whois.cpp
-- check or delete whowas.cpp
-- faire kick.cpp
+# A faire avant de push
 
-# bugs :
-lors de proccessus en pause, message qui se dupliquent ... a check
-check la protection n_max sur le serveur (fait ou non ?)
-
-
-# finir bot :
+## finir bot :
 ...

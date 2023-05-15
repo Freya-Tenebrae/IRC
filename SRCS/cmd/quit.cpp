@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:43:54 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/15 18:02:31 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,24 @@ Numeric Replies:
 None
 */
 
+static bool user_is_on_channel(Channel *chan, User *user)
+{
+	for (std::vector<User *>::const_iterator it = chan->get_ch_usr_list().begin(); it != chan->get_ch_usr_list().end(); it++)
+	{
+		if (*it == user)
+			return (true);
+	}
+	return (false);
+}
+
 std::vector<Reply>	Server::quit(User *user, std::vector<std::string> args)
 {
+	(void) args;
 	std::vector<Reply> reply;
-	(void)user;
-	(void)args;
-	
+	for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
+	{
+		if (user_is_on_channel(*it, user) == true)
+			(*it)->del_user(user);
+	}
 	return (reply);
 }
