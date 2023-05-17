@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:43:56 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/16 16:31:01 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,5 +51,4 @@ std::vector<Reply>	Server::squit(User *user, std::vector<std::string> args)
 		reply[0].prep_to_send(1);
 	}
 	return (reply);
-	// does nothing, we only have one server
 }

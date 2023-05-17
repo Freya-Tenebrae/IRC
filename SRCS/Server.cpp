@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/05/15 16:33:10 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/16 16:45:37 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -484,6 +484,12 @@ int		Server::polling_loop()
 					break;
 				}
 			}
+			for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end();)
+			{
+				Channel *chan = *it;
+				it++;
+				delete chan;
+			}
 			fds[fd_cursor].fd = -1;
 			fds[fd_cursor].events = 0;
 			// CELIA PAR ICI (cf discord)
@@ -582,7 +588,6 @@ void	Server::run_buffer(int fd, std::string buffer)
 		if (it->compare("") != 0)
 		{
 			std::cout << "\033[1;32m" << user->get_fd() << " <- \033[1;36m|\033[0m" << *it << "\033[1;36m|\033[0m" << std::endl;
-			std::cerr << "\033[36m line : ->|" << *it << "|<-\033[0m" << std::endl;
 			// push all rpls on file named log instead of cout
 		}
 	}
@@ -600,9 +605,7 @@ std::vector<std::string>	Server::pars_buffer(std::string &buffer)
 	std::vector<std::string>	lines;
 	while (buffer.length() != 0)
 	{
-		// std::cout << "\033[1;32m|" << buffer << "|\033[0m" << std::endl;
 		pos = buffer.find('\n');
-		// std::cout << "\033[1;34m<>" << pos << "<>\033[0m" << std::endl;
 		if (pos == std::string::npos)
 		{
 			line = buffer.substr(0, buffer.length());
@@ -622,9 +625,6 @@ void	Server::run_line(User *user, std::string &line)
 {
 	std::vector<std::string>	args = pars_line(line);
 	std::string					cmd = args[0];
-
-						for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); it++)
-							std::cerr << "\033[36m args : ->|" << *it << "|<-\033[0m" << std::endl;
 
 	args.erase(args.begin());
 	std::vector<Reply>			rpls = command(user, cmd, args);
@@ -662,14 +662,6 @@ void	Server::send_message(const User *user, std::string message)
 		send(user->get_fd(), message.c_str(), message.length(), 0);
 		message.erase(message.begin() + message.size() - 1);
 		message.insert(0, " ");
-		// if (user != NULL) // for log only
-		// {
-		// 	message.insert(0, user->get_hostaddr());
-		// 	message.insert(0, "@");
-		// 	message.insert(0, user->get_username());
-		// 	message.insert(0, "!");
-		// 	message.insert(0, user->get_nickname());
-		// }
 		std::cout << "\033[1;35m" << user->get_fd() << " -> \033[1;36m|\033[0m";
 		std::cout << message << "\033[1;36m|\033[0m" << std::endl;
 		// push all rpls on file named log instead of cout
