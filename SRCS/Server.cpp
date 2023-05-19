@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/05/16 16:45:37 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/18 20:03:57 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,33 +21,46 @@ Server::Server(int port, str password, t_sock_conf sock_conf):_password(password
 	this->_oper_id = DEFAULT_OPER_ID;
 	this->_oper_password = DEFAULT_OPER_PWD;
 	this->_socketfd = 0;
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣿⣿⣿⣆⢳⡀⠀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⣿⣿⣿⣿⣾⣷⡀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠠⣄⠀⢠⣿⣿⣿⣿⡎⢻⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⢸⣿⣿⣿⣿⡇⠀⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣾⣿⣿⣿⣿⠃⠀⢸⣿⣿⣿⣿⣿⣿⠀⣄⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⢠⣾⣿⣿⣿⣿⣿⠏⠀⠀⣸⣿⣿⣿⣿⣿⡿⢀⣿⡆⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⢀⣴⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⣿⣿⣿⣿⣿⣿⠇⣼⣿⣿⡄");
-	this->_modt.push_back("⠀⢰⠀⠀⣴⣿⣿⣿⣿⣿⣿⡿⠁⠀⠀⠀⢠⣿⣿⣿⣿⣿⡟⣼⣿⣿⣿⣧");
-	this->_modt.push_back("⠀⣿⡀⢸⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⣸⡿⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿");
-	this->_modt.push_back("⠀⣿⣷⣼⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⢹⠃⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿");
-	this->_modt.push_back("⡄⢻⣿⣿⣿⣿⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⣿⣿⣿⠇");
-	this->_modt.push_back("⢳⣌⢿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⠏⠀");
-	this->_modt.push_back("⠀⢿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣿⣿⣿⠋⣠⠀");
-	this->_modt.push_back("⠀⠈⢻⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣵⣿⠃⠀");
-	this->_modt.push_back("⠀⠀⠀⠙⢿⣿⣿⣿⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⣿⡿⠃⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠙⢿⣿⣿⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⡿⠋⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠈⠛⠿⣿⣦⣀⠀⠀⠀⠀⢀⣴⠿⠛⠁⠀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠓⠂⠀⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-	this->_modt.push_back("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀FT_IRC⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⡿⣿⣻⡿⣿⡿⣿⣟⢿⡛⡗⡿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⡿⣽⢾⢽⣳⢯⢿⢽⢯⢷⣳⣟⡷⡛⢕⢎⡪⡪⢎⢯⢿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⢿⢿⡿⣿⣻⣟⣯⢯⢿⢽⡽⡯⣯⢿⢽⢯⢿⣽⣳⣗⣟⡷⣝⢜⡘⣜⢜⢼⢽⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⡓⡯⡍⡇⡏⠮⣸⢨⢪⡿⡽⣯⢯⡿⣽⡽⣯⡿⣟⡾⣞⡷⡯⣯⢯⡷⡩⡒⡝⣮⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣞⢜⢌⢖⢜⢝⢜⢼⢽⣞⣯⢯⡯⣯⢷⣻⣳⣟⣽⢽⢯⢯⢿⢽⢽⣽⣳⢧⣳⣷⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣷⡝⡎⡎⣕⢅⢧⢿⡽⣞⡾⢯⣟⣽⢽⡳⡏⡾⡱⢷⣧⡛⣬⣭⣷⣵⣫⢟⣞⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⢵⡹⡢⣃⣯⢯⡯⣷⢋⣟⠮⣞⣏⣪⣗⢕⢱⣫⣾⣇⠈⣿⣿⣿⣿⣿⢵⡫⣟⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⡽⣞⣦⢯⡯⣯⢣⣪⡆⠙⣿⣿⣿⣿⣷⣟⣿⣿⣿⡄⢸⣿⣿⣿⡿⡙⢷⢮⣎⣻⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⡿⡽⡋⡢⡿⣽⢣⢱⣿⣷⠀⠘⣿⣿⣿⣿⡿⣾⣟⡿⣿⣼⢿⣟⣿⠰⡑⡍⢯⢿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣹⣼⡧⡱⡿⡝⢔⢹⣿⣿⣧⡀⣿⣿⡿⣻⣾⣿⣽⣟⣿⣺⣿⣽⡏⢎⣬⡊⡆⡻⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣇⣾⣯⣮⣼⣐⢍⢻⢻⣷⣽⣷⣟⢿⣻⣾⣺⣽⣯⣾⢿⢞⢜⠔⢼⣿⣷⣮⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⢿⣽⡷⣿⢾⣻⣿⢷⡡⡣⢫⢳⢿⣽⡿⣷⣟⣯⣿⡾⣻⡑⢽⣷⣧⣹⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣟⣿⣽⢿⣻⣿⣻⣽⣿⡇⢎⣮⡢⡣⡩⡝⣝⣭⣹⣲⣮⣿⣟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣚⣿⣽⣿⣻⣽⣿⣽⡾⣝⢶⣧⣻⣿⣿⣷⣿⣿⣟⣯⣿⣿⣽⣿⣷⣿⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣷⣎⡕⡟⢯⢻⢺⢓⢝⢝⢼⣿⣷⣿⡷⣿⣿⣿⣿⣿⣿⣿⣷⡹⡝⣟⣿⣾⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣾⣾⣾⣾⣗⢵⢱⢿⢿⢟⢯⣚⣿⣿⣿⣿⣿⣿⣿⣿⢪⣾⢿⣿⢯⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣷⣿⣿⡪⡲⡵⣿⣿⣿⣿⣿⣿⣿⡽⣟⣿⣷⣻⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠫⣇⢯⣻⣿⣿⣿⣿⣿⣿⠛⣿⣯⢿⣻⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⡻⡐⠅⠀⠄⠄⢄⠡⢉⠛⡛⢋⢐⢈⢿⣾⢿⣻⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢽⢏⢇⣮⠀⠁⠌⠌⡐⠨⢐⠐⡠⢁⠢⢐⢨⣶⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⢯⢫⣾⣿⡇⠀⠨⠨⢐⠠⢑⠐⠨⢐⢐⠨⢐⠸⣿⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⢷⢯⣳⣿⣿⡟⠀⢈⠨⠠⠡⠨⢐⠨⠨⢐⠠⠨⢐⠐⣿⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣻⡽⣽⣿⣿⣿⠃⠠⠐⠨⢐⢁⢊⢐⠨⢐⢐⠨⢈⢐⢈⢻⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣯⡿⣿⣿⣿⣿⡽⡗⣽⣿⣿⣿⡟⠀⠠⠨⠨⢐⠠⠂⠔⠨⢐⠠⠨⢐⠐⠠⢺⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣧⢓⢿⣝⣟⡯⡾⣛⣼⣿⣿⣿⣿⣧⡔⠀⠌⡐⡐⠨⢈⠌⡨⢐⠨⢈⢐⠨⢨⣶⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣧⣇⣝⣚⣝⣼⣿⣿⣿⣿⣿⣿⣿⠀⠠⢀⣷⣶⣧⣦⣂⣂⣂⣬⡤⠀⡂⢼⣿⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⠀⠅⢸⣿⣿⣿⣿⣿⣿⣿⣿⡁⢐⠠⢈⠙⠻⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢁⠨⠐⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣀⠂⠨⠐⡈⢙⢿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⢀⠂⠄⣡⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⣄⠂⠐⡀⠢⣍⠻");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠃⡐⠠⢈⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⣀⡁⠄⣂");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⠋⠄⢌⠔⡁⢌⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("⣿⣿⣿⣿⣿⣿⣿⣴⣈⣀⣁⣤⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿");
+	this->_modt.push_back("                    NECO_IRC                    ");
 	this->_info.push_back("ft_irs is an irc server designed for irssi client");
 	this->_info.push_back("it's actual version is 0.3 ans is developped by cmaginot, mmercore, and plam");
+	if (MAX_USERS < 1 || MAX_LINE_SIZE < 50 || DEFAULT_TIMEOUT < 500 )
+	{
+		this->errval = bad_param;
+		return ;
+	}
 	if (port < 0 || port > 65353)
 	{
 		this->errval = bad_param_port;
@@ -114,6 +127,7 @@ str			Server::get_errval(t_serv_error errval) const
 	switch (errval)
 	{
 		case nothing:		return("nothing");
+		case bad_param:		return("bad_param");
 		case bad_param_port:return("bad_param_port");
 		case bad_param_pwd:	return("bad_param_pwd");
 		case syscall_fail:	return("syscall_fail");
@@ -289,6 +303,16 @@ int		Server::start()
 	return (0);
 }
 
+static bool user_is_on_channel(Channel *chan, User *user)
+{
+	for (std::vector<User *>::const_iterator it = chan->get_ch_usr_list().begin(); it != chan->get_ch_usr_list().end(); it++)
+	{
+		if (*it == user)
+			return (true);
+	}
+	return (false);
+}
+
 int		Server::polling_loop()
 {
 	// return (0);
@@ -322,7 +346,7 @@ int		Server::polling_loop()
 		{
 			PRERR "TIMEOUT" ENDL;
 			this->errval = timeout;
-			return (1);
+			break;
 		}
 		else
 		{
@@ -399,9 +423,9 @@ int		Server::polling_loop()
 						if (recv_ret <= 0 || find_user(fds[fd_cursor].fd)->get_kicked() == 1 || this->errval != 0)
 						{
 							// erreurs & close
-							if (errno != EWOULDBLOCK || recv_ret == 0 || this->errval == server_close || this->errval == server_restart || (this->errval == user_close && find_user(fds[fd_cursor].fd)->get_kicked() == 1))
+							if (errno != EWOULDBLOCK || recv_ret == 0 || this->errval == server_close || this->errval == server_restart || this->errval == timeout || (this->errval == user_close && find_user(fds[fd_cursor].fd)->get_kicked() == 1))
 							{
-								send(fds[fd_cursor].fd, "The server has closed the connection.\n", sizeof(char) * 38, 0);
+								send(fds[fd_cursor].fd, "The server has closed the connection.\n", sizeof(char) * 38, MSG_NOSIGNAL);
 								close(fds[fd_cursor].fd);
 								//this->errval = recv_fail;
 								PRERR "ERREURS ET CLOSE" ENDL
@@ -411,6 +435,11 @@ int		Server::polling_loop()
 									if ((*it)->get_fd() == fds[fd_cursor].fd)
 									{
 										User * usr = *it;
+										for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
+										{
+											if (user_is_on_channel(*it, usr) == true)
+												(*it)->del_user(usr);
+										}
 										_usr_list.erase(it);
 										delete usr;
 										break;
@@ -465,7 +494,7 @@ int		Server::polling_loop()
 			}
 		}
 	}
-	if (this->errval == server_close || this->errval == server_restart)
+	if (this->errval == server_close || this->errval == server_restart || this->errval == timeout)
 	{
 		fd_cursor = 1;
 		while (fd_cursor < fd_counter)
@@ -512,25 +541,28 @@ int		Server::polling_loop()
 int		Server::compilecommand(char *message, int fd)
 {
 	this->_buffers[fd].append(message);
-	if (this->_buffers[fd].find("EVACWINCHESTER") != str::npos)
+	if (DEBUG_MODE)
 	{
-		this->errval = server_restart;
-		this->_buffers[fd].clear();
-		return (1);
-	}
-	if (this->_buffers[fd].find("EVACBINGO") != str::npos)
-	{
-		this->errval = server_close;
-		this->_buffers[fd].clear();
-		return (1);
-	}
-	if (this->_buffers[fd].find("CLOSEME") != str::npos)
-	{
-		find_user(fd)->set_kicked(1);
-		//close(fd);
-		this->errval = user_close;
-		this->_buffers[fd].clear();
-		return (1);
+		if (this->_buffers[fd].find("EVACWINCHESTER") != str::npos)
+		{
+			this->errval = server_restart;
+			this->_buffers[fd].clear();
+			return (1);
+		}
+		if (this->_buffers[fd].find("EVACBINGO") != str::npos)
+		{
+			this->errval = server_close;
+			this->_buffers[fd].clear();
+			return (1);
+		}
+		if (this->_buffers[fd].find("CLOSEME") != str::npos)
+		{
+			find_user(fd)->set_kicked(1);
+			//close(fd);
+			this->errval = user_close;
+			this->_buffers[fd].clear();
+			return (1);
+		}	
 	}
 	PRERR "Message size  " << this->_buffers[fd] ENDL;
 	if (this->_buffers[fd].find(CRLF) != str::npos)
@@ -655,13 +687,12 @@ std::vector<std::string>	Server::pars_line(std::string &line)
 	return args;
 }
 
-void	Server::send_message(const User *user, std::string message)
+void	Server::send_message(User *user, std::string message)
 {
 	if (message.compare("") != 0)
 	{
-		send(user->get_fd(), message.c_str(), message.length(), 0);
+		send(user->get_fd(), message.c_str(), message.length(), MSG_NOSIGNAL);
 		message.erase(message.begin() + message.size() - 1);
-		message.insert(0, " ");
 		std::cout << "\033[1;35m" << user->get_fd() << " -> \033[1;36m|\033[0m";
 		std::cout << message << "\033[1;36m|\033[0m" << std::endl;
 		// push all rpls on file named log instead of cout

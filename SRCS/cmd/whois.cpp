@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   whois.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/15 17:49:39 by plam             ###   ########.fr       */
+/*   Updated: 2023/05/18 16:25:26 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,6 @@ std::vector<Reply>	Server::whois(User *user, std::vector<std::string> args)
 				{
 					reply.push_back(RPL_WHOISUSER);
 					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "is logged in as");
-					reply[reply.size()-1].add_arg(user->get_nickname(), "");	//client
 					reply[reply.size()-1].add_arg((*it_usr)->get_username(), "username");
 					reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "hostname");
 					reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "realname");
@@ -151,7 +150,6 @@ std::vector<Reply>	Server::whois(User *user, std::vector<std::string> args)
 					{
 						reply.push_back(RPL_WHOISCERTFP);
 						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-						reply[reply.size()-1].add_arg(user->get_nickname(), "");	//client
 
 						reply.push_back(RPL_WHOISREGNICK);
 						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
@@ -170,6 +168,13 @@ std::vector<Reply>	Server::whois(User *user, std::vector<std::string> args)
 						{
 							if ((*it_ch)->get_User(user->get_fd()) != NULL)
 								reply[reply.size()-1].add_arg((*it_ch)->get_name(), "");
+							// if (chan->check_if_complexe_mode_is_correct('o', (*it)->get_nickname()) == true)
+							// 	reply[reply.size() - 1].add_arg_alt("@", "prefix");
+							// else
+							// 	reply[reply.size() - 1].add_arg_alt("", "prefix");
+
+																							// 								#define RPL_ENDOFWHOIS Reply(318, "<client> <nick> :End of /WHOIS list\n")
+																							// #define RPL_WHOISCHANNELS Reply(319, "<client> <nick> :\n")
 						}
 						if (args[0][0] == '#')
 						{

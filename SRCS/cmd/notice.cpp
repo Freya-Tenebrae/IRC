@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/26 13:40:52 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/18 17:04:06 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void Server::notice_channel(User *user, std::vector<std::string> &args, std::str
 	}
 }
 
-void Server::notice_user(User *user, const User *target, std::string &message)
+void Server::notice_user(User *user, User *target, std::string &message)
 {
 	std::vector<Reply>	to_send;
 
@@ -129,7 +129,7 @@ std::vector<Reply>	Server::notice(User *user, std::vector<std::string> args)
 		}
 		else
 		{
-			const User *user_target = find_user_by_nickname(args[target]);
+			User *user_target = find_user_by_nickname(args[target]);
 			if (user_target != NULL)
 				notice_user(user, user_target, message);
 		}

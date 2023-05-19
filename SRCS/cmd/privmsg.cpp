@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 21:12:24 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/18 17:04:43 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ std::vector<Reply> Server::privmsg_channel(User *user, std::vector<std::string> 
 	return (reply);
 }
 
-std::vector<Reply> Server::privmsg_user(User *user, const User *target, std::string &message)
+std::vector<Reply> Server::privmsg_user(User *user, User *target, std::string &message)
 {
 	std::vector<Reply>	reply, to_send;
 
@@ -190,7 +190,7 @@ std::vector<Reply>	Server::privmsg(User *user, std::vector<std::string> args)
 		}
 		else
 		{
-			const User *user_target = find_user_by_nickname(args[target]);
+			User *user_target = find_user_by_nickname(args[target]);
 			if (user_target == NULL)
 			{
 				reply.push_back(ERR_NOSUCHNICK);

@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 17:32:30 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/15 16:16:44 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/18 17:21:44 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,20 +74,21 @@ class Reply
 #define RPL_LOCALUSERS Reply(265, "<client> [<u> <m>] :Current local users <u>, max <m>\n")
 #define RPL_GLOBALUSERS Reply(266, "<client> [<u> <m>] :Current global users <u>, max <m>\n")
 #define RPL_WHOISCERTFP Reply(276, "<nick> <client>:has client certificate fingerprint <fingerprint>\n")
-#define RPL_NONE Reply(300, "")
+#define RPL_NONE Reply(300, "\n")
 #define RPL_AWAY Reply(301, "<client> <nick> :<message>\n")
 #define RPL_USERHOST Reply(302, "<client> :[<reply>{ <reply>}]\n")
 #define RPL_UNAWAY Reply(305, "<client> :You are no longer marked as being away\n")
 #define RPL_NOWAWAY Reply(306, "<client> :You have been marked as being away\n")
 #define RPL_WHOISREGNICK Reply(307, "<client> <nick> :has identified for this nick\n")
-#define RPL_WHOISUSER Reply(311, "<nick> <client> <username> <hostname> * <realname>\n")
+#define RPL_WHOISUSER Reply(311, "<nick> <client> <username> <hostname> <realname>\n")
 #define RPL_WHOISSERVER Reply(312, "<client> <nick> <server> :<server info>\n")
 #define RPL_WHOISOPERATOR Reply(313, "<client> <nick> :is an IRC operator\n")
-#define RPL_WHOWASUSER Reply(314, "<client> <nick> <username> <host> * :<realname>\n")
+#define RPL_WHOWASUSER Reply(314, "<client> <nick> <username> <host> :<realname>\n")
 #define RPL_ENDOFWHO Reply(315, "<client> <mask> :End of WHO list\n")
 #define RPL_WHOISIDLE Reply(317, "<client> <nick> <secs> <signon> :seconds idle, signon time\n")
 #define RPL_ENDOFWHOIS Reply(318, "<client> <nick> :End of /WHOIS list\n")
-#define RPL_WHOISCHANNELS Reply(319, "<client> <nick> :[prefix]<channel>{ [prefix]<channel>}\n")
+#define RPL_WHOISCHANNELS Reply(319, "<client> <nick> :\n")
+#define RPL_RPL_WHOISCHANNELS_LOOP " [prefix]<nick>"
 #define RPL_WHOISSPECIAL Reply(320, "<client> <nick> :<message>\n")
 #define RPL_LISTSTART Reply(321, "<client> Channel :Users  Name\n")
 #define RPL_LIST Reply(322, "<client> <channel> <client count> :<topic>\n")

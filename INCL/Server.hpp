@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/15 17:48:07 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/18 19:49:44 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,30 @@
 # define __server_HPP__
 
 # include "ft_irc.hpp"	
-// Eventuellement il faudra bouger ces defines vers un fichier de conf
+// Dans un vrai serveur, ces defines seraient un fichier de configuration.
 // Par securite
 # define DEFAULT_PORT 8080
 # define DEFAULT_PWD "abc"
 # define DEFAULT_OPER_ID "admin"
 # define DEFAULT_OPER_PWD "admin"
-# define DEFAULT_TIMEOUT 5*60*1000 // Expressed in ms
-# define MAX_LINE_SIZE 210
+# define DEFAULT_TIMEOUT 5*60*1000 // Expressed in ms, minimum 500
+# define MAX_LINE_SIZE 210 // Minimum 50
 # define NEW_CONNECTION_MESSAGE "You have connected to FT_IRC\n"
 # define VERSION "0.3"
-# define CRLF "\r"
-# define MAX_USERS 5 // The server also counts as a user
+# define CRLF "\r\n"
+# define MAX_USERS 5 // The server also counts as a user, minimum 1
+# define DEBUG_MODE 0 // If set to 1 activates remote close/restart of the server
+// These are a security risk as they bypass Oper
+// See Server.cpp 518
 
+// This structure contains the necessary parameters to configure a socket server
+// And modify flags
 typedef struct	e_sock_conf {
-//	void			socket_params;
+//					socket_params;
 	int				domain;
 	int				type;
 	int				protocol;
-//	void			socket_opts;
+//					socket_opts;
 	int				level;
 	int				optname;
 	int				optname2;
@@ -41,8 +46,13 @@ typedef struct	e_sock_conf {
 	socklen_t		optlen;
 }				t_sock_conf;
 
+// Les differentes erreurs qui pourraient necessiter de fermer des FDs
+// Que le serveur gere de maniere safe
+// On l'utilise egalement pour connaitre l'etat de fin du programme
+// cf main.cpp
 typedef enum e_serv_error {
 	nothing = 0,
+	bad_param,
 	bad_param_port,
 	bad_param_pwd,
 	syscall_fail,
@@ -66,7 +76,7 @@ typedef enum e_serv_error {
 // >man socket
 //		Type:
 // Pour l'instant SOCK_STREAM
-// J'ai [as trop test les autres]
+// J'ai pas trop test les autres
 //		Protocol:
 // Il n'y a qu'un type de protocol pour SOCK_STREAM
 // 0 le choisit par defaut
@@ -90,10 +100,13 @@ typedef enum e_serv_error {
 //		Optlen:
 // La len de ce que pointe opval
 
+//https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html
+// Equivalent a struct sockaddr* en cast, supporte plus d'implementations
 typedef struct sockaddr_in	ssocki;
 typedef struct sockaddr		ssock;
 typedef	struct pollfd		spollfd;
 
+// 
 # define	DEFAULT_SC	(t_sock_conf){		\
 	.domain=AF_INET,						\
 	.type=SOCK_STREAM,						\
@@ -153,7 +166,7 @@ class Server {
 		std::vector<std::string>	pars_buffer(std::string &buffer);
 		void						run_line(User *user, std::string &line);
 		std::vector<std::string>	pars_line(std::string &line);
-		void						send_message(const User *user, std::string message);
+		void						send_message(User *user, std::string message);
 		std::vector<Reply>			command(User *user, std::string commandName, std::vector<std::string> args);
 		
 
@@ -201,10 +214,10 @@ class Server {
 		std::vector<Reply>			mode(User *user, std::vector<std::string> args);
 		std::vector<Reply>			privmsg(User *user, std::vector<std::string> args);
 		std::vector<Reply>			privmsg_channel(User *user, std::vector<std::string> &args, std::string &message);
-		std::vector<Reply>			privmsg_user(User *user, const User *target, std::string &message);
+		std::vector<Reply>			privmsg_user(User *user, User *target, std::string &message);
 		std::vector<Reply>			notice(User *user, std::vector<std::string> args);
 		void 						notice_channel(User *user, std::vector<std::string> &args, std::string &message);
-		void 						notice_user(User *user, const User *target, std::string &message);
+		void 						notice_user(User *user, User *target, std::string &message);
 		std::vector<Reply>			who(User *user, std::vector<std::string> args);
 		std::vector<Reply>			whois(User *user, std::vector<std::string> args);
 		std::vector<Reply>			whowas(User *user, std::vector<std::string> args);
@@ -222,6 +235,9 @@ class Server {
 		//https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html
 		// Equivalent a struct sockaddr* en cast, supporte plus d'implementations
 		ssocki	_address;
+		
+		// +3 Car le serveur a un fd, les deux autres pour padder des struct vides
+		// au debut et a la fin
 		spollfd	fds[MAX_USERS + 3];
 		str		_buffers[MAX_USERS + 3];
 		

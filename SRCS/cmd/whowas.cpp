@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   whowas.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/11 17:20:14 by plam             ###   ########.fr       */
+/*   Updated: 2023/05/18 15:36:56 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ std::vector<Reply>	Server::whowas(User *user, std::vector<std::string> args)
 				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
 				reply[reply.size()-1].add_arg((*it_usr)->get_username(), "user");
 				reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "host");
-				reply[reply.size()-1].add_arg((*it_usr)->get_hostaddr(), "ip"); // temporary, not sure for it
+				reply[reply.size()-1].add_arg((*it_usr)->get_hostaddr(), "ip");
 			}
 		}
 		else
