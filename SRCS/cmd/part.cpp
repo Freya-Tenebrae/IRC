@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/16 16:25:00 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:01:39 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,10 @@ std::vector<Reply>	Server::part(User *user, std::vector<std::string> args)
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[target].compare("") == 0)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("PART", "command");
+	}
 	else
 	{
 		std::string channel_name_list = args[target].substr();

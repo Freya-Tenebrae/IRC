@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/26 13:36:43 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 12:59:28 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,10 @@ std::vector<Reply>	Server::invite(User *user, std::vector<std::string> args)
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[0].compare("") == 0 || args.size() < 2 || args[1].compare("") == 0)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("INVITE", "command");
+	}
 	else if (channel_exist(this, args[1]) == false)
 	{
 		reply.push_back(ERR_NOSUCHCHANNEL);

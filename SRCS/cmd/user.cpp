@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:44:00 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:03:14 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,10 @@ std::vector<Reply>	Server::user(User *user, std::vector<std::string> args)
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[username].compare("") == 0 || args.size() < 3)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("USER", "command");
+	}
 	else if (user->get_status() == USR_STAT_REGISTERED)
 		reply.push_back(ERR_ALREADYREGISTERED);
 	else

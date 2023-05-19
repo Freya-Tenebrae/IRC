@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:43:56 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:02:40 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,10 @@ std::vector<Reply>	Server::stats(User *user, std::vector<std::string> args)
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.size() == 0)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("STATS", "command");
+	}
 	else if (args.size() == 2 && args[1].compare(this->get_name()) == false)
 		reply.push_back(ERR_NOSUCHSERVER);
 	else

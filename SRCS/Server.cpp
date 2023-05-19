@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/05/18 20:03:57 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:36:59 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -487,7 +487,7 @@ int		Server::polling_loop()
 							// send(fds[fd_cursor].fd, buffer, sizeof(buffer), 0);
 							// Errors	
 						}
-					} while (compilecommand(buffer, fds[fd_cursor].fd));
+					} while (compilecommand(buffer, fd_cursor, fds[fd_cursor].fd));
 					this->fds[fd_cursor].revents = 0;
 				}
 				fd_cursor++;
@@ -513,12 +513,7 @@ int		Server::polling_loop()
 					break;
 				}
 			}
-			for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end();)
-			{
-				Channel *chan = *it;
-				it++;
-				delete chan;
-			}
+
 			fds[fd_cursor].fd = -1;
 			fds[fd_cursor].events = 0;
 			// CELIA PAR ICI (cf discord)
@@ -535,10 +530,17 @@ int		Server::polling_loop()
 			fd_counter--;
 		}
 	}
+	for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end();)
+	{
+		Channel *chan = *it;
+		it++;
+		if (chan)
+			delete chan;
+	}
 	return (0);
 }
 
-int		Server::compilecommand(char *message, int fd)
+int		Server::compilecommand(char *message, int fd, int realfd)
 {
 	this->_buffers[fd].append(message);
 	if (DEBUG_MODE)
@@ -557,7 +559,7 @@ int		Server::compilecommand(char *message, int fd)
 		}
 		if (this->_buffers[fd].find("CLOSEME") != str::npos)
 		{
-			find_user(fd)->set_kicked(1);
+			find_user(realfd)->set_kicked(1);
 			//close(fd);
 			this->errval = user_close;
 			this->_buffers[fd].clear();
@@ -565,10 +567,10 @@ int		Server::compilecommand(char *message, int fd)
 		}	
 	}
 	PRERR "Message size  " << this->_buffers[fd] ENDL;
-	if (this->_buffers[fd].find(CRLF) != str::npos)
+	if (this->_buffers[fd].find(CRLF) != str::npos && this->_buffers[fd].find_last_of(CRLF) + sizeof(CRLF) >= this->_buffers[fd].size())
 	{
 		PRERR "Correct message, going for the parse" ENDL;
-		run_buffer(fd, this->_buffers[fd].c_str());
+		run_buffer(realfd, this->_buffers[fd].c_str());
 		this->_buffers[fd].clear();
 		return (0);
 	}

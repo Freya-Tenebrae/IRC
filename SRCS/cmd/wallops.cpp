@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/30 19:05:47 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:03:37 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,10 @@ std::vector<Reply>	Server::wallops(User *user, std::vector<std::string> args)
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[text].compare("") == 0)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("WALLOPS", "command");
+	}
 	else if (user->check_if_mode_is_used('o') == false)
 		reply.push_back(ERR_NOPRIVILEGES);
 	else

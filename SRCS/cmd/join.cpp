@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/26 14:05:28 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 12:59:50 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,10 @@ std::vector<Reply> Server::join(User *user, std::vector<std::string> args)
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[channel_name].compare("") == 0)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("JOIN", "command");
+	}
 	else
 	{
 		std::string channel_name_list = args[channel_name].substr();

@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 17:01:36 by mmercore          #+#    #+#             */
-/*   Updated: 2023/05/18 19:55:28 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/18 21:09:51 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ static bool send_oper(int _socket, std::string oper_id, std::string oper_pass)
 	return (true);
 }
 
-static bool send_join(int _socket, std::string chan_name)
+static bool send_join(int _socket, std::string chan_name, std::string nick)
 {
 	std::string message = "JOIN ";
 	std::string	buffer;
@@ -140,15 +140,24 @@ static bool send_join(int _socket, std::string chan_name)
 
 	send_message(_socket, message);
 
-	while (receive(_socket, buffer) != 0);
-
-	// check if bot is operator
+	while (receive(_socket, buffer) != 0)
+	{
+		if (buffer.find("End of /NAMES list") != std::string::npos)
+		{
+			print_message_received(buffer);
+			std::string part_to_check = "@";
+			part_to_check.append(nick);
+			if (buffer.find(part_to_check) != std::string::npos)
+				return (true);
+			return (false);
+		}
+	}
 	return (true);
 }
 
 static void send_topic(int _socket, std::string chan_name, std::string topic)
 {
-	std::string message = "TOPIC  ";
+	std::string message = "TOPIC ";
 	std::string	buffer;
 
 	message.append(chan_name);
@@ -158,7 +167,15 @@ static void send_topic(int _socket, std::string chan_name, std::string topic)
 
 	send_message(_socket, message);
 
-	while (receive(_socket, buffer) != 0);
+	while (receive(_socket, buffer) != 0)
+	{
+		message = chan_name;
+		message.append(" :");
+		message.append(topic);
+		if (buffer.find(message) != std::string::npos)
+			return ;
+	}
+	return ;
 }
 
 static void send_wallops(int _socket, std::string wallop, std::string user)
@@ -167,7 +184,7 @@ static void send_wallops(int _socket, std::string wallop, std::string user)
 	std::string	buffer;
 
 	message.append(user);
-	message.append(" :"); // maybe change ':' by something else
+	message.append(" :");
 	message.append(wallop);
 	message.append(" \r\n");
 
@@ -187,50 +204,88 @@ static void send_privmsg_to_chan(int _socket, std::string chan_name, std::string
 	send_message(_socket, message);
 }
 
-static void create_message_for_bot_uppercase(int _socket, std::string buffer_after_dd)
+static void create_message_for_bot_uppercase(int _socket, std::string line_after_dd)
 {
-	std::string message = buffer_after_dd;
-	for (std::string::iterator it = message.begin(); it != message.end(); it++)
+	for (std::string::iterator it = line_after_dd.begin(); it != line_after_dd.end(); it++)
 		*it = toupper(*it);
 
-	send_privmsg_to_chan(_socket, "#bot_uppercase", message);
+	send_privmsg_to_chan(_socket, "#bot_uppercase", line_after_dd);
 }
 
-static void create_message_for_bot_lowercase(int _socket, std::string buffer_after_dd)
+static void create_message_for_bot_lowercase(int _socket, std::string line_after_dd)
 {
-	std::string message = buffer_after_dd;
-	for (std::string::iterator it = message.begin(); it != message.end(); it++)
+	for (std::string::iterator it = line_after_dd.begin(); it != line_after_dd.end(); it++)
 		*it = tolower(*it);
 
-	send_privmsg_to_chan(_socket, "#bot_lowercase", message);
+	send_privmsg_to_chan(_socket, "#bot_lowercase", line_after_dd);
 }
 
-static void manage_primsg_received(int _socket, std::string buffer_before_dd, std::string buffer_after_dd)
+static void manage_primsg_received(int _socket, std::string line_before_dd, std::string line_after_dd)
 {
-	if (buffer_before_dd.find("PRIVMSG") != std::string::npos) // && buffer_before_dd.find(nick) == std::string::npos)
+	if (line_before_dd.find("PRIVMSG") != std::string::npos) // && line_before_dd.find(nick) == std::string::npos)
 	{
-		if (buffer_before_dd.find("#bot_uppercase") != std::string::npos)
-			create_message_for_bot_uppercase(_socket, buffer_after_dd);
-		else if (buffer_before_dd.find("#bot_lowercase") != std::string::npos)
-			create_message_for_bot_lowercase(_socket, buffer_after_dd);
+		if (line_before_dd.find("#bot_uppercase") != std::string::npos)
+			create_message_for_bot_uppercase(_socket, line_after_dd);
+		else if (line_before_dd.find("#bot_lowercase") != std::string::npos)
+			create_message_for_bot_lowercase(_socket, line_after_dd);
 	}
 }
 
-static void manage_notice_received(int _socket, std::string buffer_before_dd, std::string buffer_after_dd)
+static void manage_notice_received(int _socket, std::string line_before_dd, std::string line_after_dd)
 {
-	if (buffer_before_dd.find("NOTICE") != std::string::npos)
+	if (line_before_dd.find("NOTICE") != std::string::npos)
 	{
 		std::string user_nickname;
-		user_nickname = buffer_before_dd.substr(buffer_before_dd.find("NOTICE") + 1);
+		user_nickname = line_before_dd.substr(1, line_before_dd.find('!') - 1);
 
-		send_wallops(_socket, buffer_after_dd, user_nickname);
+		send_wallops(_socket, line_after_dd, user_nickname);
+	}
+}
+
+static void loop(int _socket, std::string nick)
+{
+	std::string	buffer;
+	std::string self_message = ":";
+
+	self_message.append(nick);
+	self_message.append("!");
+	self_message.append(nick);
+	self_message.append("!");
+	self_message.append("127.0.0.1");
+
+	std::cout << "start loop" << std::endl;
+
+	while(42 == 42)
+	{
+		receive(_socket, buffer);
+		print_message_received(buffer);
+
+		while (buffer.find('\n') != std::string::npos)
+		{
+			std::string line = buffer.substr(0, buffer.find('\n') + 1);
+			buffer.erase(0, buffer.find('\n') + 1);
+			std::string line_before_dd = "";
+			std::string line_after_dd = "";
+
+			line_before_dd = line.substr(0, line.find_last_of(':'));
+			line_after_dd = line.substr(line.find_last_of(':') + 1);
+
+			line_after_dd.erase(line_after_dd.begin() + line_after_dd.size() - 1);
+			// std::cout << "line_before_dd : >" << line_before_dd << "<" << std::endl;
+			// std::cout << "line_after_dd : >" << line_after_dd << "<" <<std::endl;
+
+			if (line_before_dd.find(self_message) == std::string::npos)
+			{
+				manage_primsg_received(_socket, line_before_dd, line_after_dd);
+				manage_notice_received(_socket, line_before_dd, line_after_dd);
+			}
+		}
 	}
 }
 
 int main(int ac, char **av)
 {
 	int			port;
-	std::string	buffer;
 	std::string	nick = "bot";
 	std::string	pass = "abc";
 	std::string	oper_id = "admin";
@@ -304,13 +359,13 @@ int main(int ac, char **av)
 		return (0);
 	}
 
-	if (send_join(_socket, "#bot_uppercase") == false)
+	if (send_join(_socket, "#bot_uppercase", nick) == false)
 	{
 		PRERR "CANNOT CREATE #bot_uppercase CHANNEL" ENDL;
 		return (0);
 	}
 
-	if (send_join(_socket, "#bot_lowercase") == false)
+	if (send_join(_socket, "#bot_lowercase", nick) == false)
 	{
 		PRERR "CANNOT CREATE #bot_lowercase CHANNEL" ENDL;
 		return (0);
@@ -321,21 +376,9 @@ int main(int ac, char **av)
 	send_wallops(_socket, "I'm on the server", nick);
 	send_wallops(_socket, "you can join #bot_uppercase to put your message in uppercase", nick);
 	send_wallops(_socket, "you can join #bot_lowercase to put your message in lowecase", nick);
-	send_wallops(_socket, "you can send me a NOTICE, i'll put it in WALLOPS message", nick);
+	send_wallops(_socket, "you can send me a NOTICE, i-ll put it in WALLOPS message", nick);
 
-	while(1)
-	{
-		std::string buffer_before_dd = "";
-		std::string buffer_after_dd = "";
-
-		receive(_socket, buffer);
-
-		buffer_before_dd = buffer.substr(0, buffer.find(':'));
-		buffer_after_dd = buffer.substr(buffer.find(':') + 1);
-
-		manage_primsg_received(_socket, buffer_before_dd, buffer_after_dd);
-		manage_notice_received(_socket, buffer_before_dd, buffer_after_dd);
-	}
+	loop(_socket, nick);
 
 	close(_socket);
 	return (0);

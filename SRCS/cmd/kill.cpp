@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kill.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 16:02:39 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:09:47 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,20 +66,39 @@ NOTE: The KILL message is weird, and I need to look at it more closely, add some
 std::vector<Reply>	Server::kill(User *user, std::vector<std::string> args)
 {
 	std::vector<Reply> reply;
-	(void)user;
-	(void)args;
+	int usr_targeted = 0;
+
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[0].compare("") == 0)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("KILL", "command");
+	}
 	else if (user->check_if_mode_is_used('o') == false)
 		reply.push_back(ERR_NOPRIVILEGES);
 	else
 	{
-		user->set_kicked(1);
-		this->errval = user_close;	
+		User *usr = find_user_by_nickname(args[usr_targeted]);
+
+		if (usr == NULL)
+		{
+			reply.push_back(ERR_NOSUCHNICK);
+			reply[reply.size() - 1].add_arg(args[usr_targeted], "nickname");
+		}
+		else
+		{
+			usr->set_kicked(1);
+			this->errval = user_close;
+		}
+
+		for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+		{
+			it->add_user(user);
+			it->prep_to_send(1);
+		}
 	}
 	return (reply);
 }

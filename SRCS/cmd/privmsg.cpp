@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/18 17:04:43 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:02:03 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,10 @@ std::vector<Reply>	Server::privmsg(User *user, std::vector<std::string> args)
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.empty() == true || args[target].compare("") == 0 || args.size() < 2 || args[message_strat].compare("") == 0)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("PRIVMSG", "command");
+	}
 	else if (args[message_strat][0] != ':')
 		reply.push_back(ERR_TOOMANYTARGETS);
 	else if (args.size() < 3 && args[message_strat].compare(":") == 0)

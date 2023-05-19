@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/30 19:17:33 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:01:28 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,10 @@ std::vector<Reply>	Server::oper(User *user, std::vector<std::string> args)
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
 	else if (args.size() < 2 || args[id].compare("") == 0 || args[password].compare("") == 0)
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("OPER", "command");
+	}
 	else if (false != false)	//(!args[0].compare(user->get_hostaddr())) //temporary, need a adequate comparing value for hostname
 		reply.push_back(ERR_NOOPERHOST);
 	else if (args[0].compare(this->_oper_id) != 0 || args[1].compare(this->_oper_password) != 0)

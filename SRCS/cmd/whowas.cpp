@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/18 15:36:56 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:04:06 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,10 @@ std::vector<Reply>	Server::whowas(User *user, std::vector<std::string> args)
 			reply.push_back(ERR_NONICKNAMEGIVEN);
 	}
 	else
+	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
+		reply[reply.size() - 1].add_arg("WHOWAS", "command");
+	}
 	reply.push_back(RPL_ENDOFWHOWAS);
 	reply[reply.size()-1].add_arg(args[nick], "");
 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
