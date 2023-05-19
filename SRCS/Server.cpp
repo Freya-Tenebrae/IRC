@@ -6,7 +6,7 @@
 /*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/05/19 13:36:59 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:48:01 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -353,10 +353,12 @@ int		Server::polling_loop()
 			fd_cursor = 0;
 			while (fd_cursor < fd_counter && this->errval != server_close && this->errval != server_restart)
 			{
-				PRERR "revents for fd " << fd_cursor << " out of " << fd_counter << " is " ENDL
+				if (DEBUG_MODE)
+					PRERR "revents for fd " << fd_cursor << " out of " << fd_counter << " is " ENDL
 				if (fds[fd_cursor].revents == 0)
 				{
-					PRERR "Doin a skippy on fd " << fd_cursor << " out of " << fd_counter ENDL
+					if (DEBUG_MODE)
+						PRERR "Doin a skippy on fd " << fd_cursor << " out of " << fd_counter ENDL
 					fd_cursor++;
 					continue;
 				}
@@ -394,9 +396,9 @@ int		Server::polling_loop()
 							fds[fd_counter].fd = new_fd;
 							fds[fd_counter].events = POLLIN;
 							fds[fd_counter].revents = 0;
-							PRERR "\033[31mNEW CONNECTION HIHI\033[0m" ENDL;
+							PRERR "\033[31mNEW CONNECTION\033[0m" ENDL;
 							//send(fds[fd_counter].fd, this->_motd.c_str(), this->motd, 0);
-							PRERR "\033[31mNew fd is now \033[0m" << new_fd << "e are at " << fd_cursor << " Out of " << fd_counter ENDL
+							PRERR "\033[31mNew fd is now \033[0m" << new_fd << ". We are at " << fd_cursor << " Out of " << fd_counter << " total connections. Maximum being " << MAX_LINE_SIZE ENDL
 
 							User	*u = new User(fds[fd_counter].fd);
 							u->set_hostname("localhost");
@@ -410,7 +412,6 @@ int		Server::polling_loop()
 				}
 				else
 				{
-					PRERR "TEST" ENDL
 					recv_ret = 0;
 					std::string full_buffer = "";
 					do
@@ -418,7 +419,6 @@ int		Server::polling_loop()
 						for (int i = 0; i < MAX_LINE_SIZE; i++)
 							buffer[i] = 0;
 						// MSG_DONTWAIT for nonblock sim
-						PRERR "READ" ENDL
 						recv_ret = recv(fds[fd_cursor].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 						if (recv_ret <= 0 || find_user(fds[fd_cursor].fd)->get_kicked() == 1 || this->errval != 0)
 						{
@@ -428,7 +428,8 @@ int		Server::polling_loop()
 								send(fds[fd_cursor].fd, "The server has closed the connection.\n", sizeof(char) * 38, MSG_NOSIGNAL);
 								close(fds[fd_cursor].fd);
 								//this->errval = recv_fail;
-								PRERR "ERREURS ET CLOSE" ENDL
+								if (DEBUG_MODE)
+									PRERR "ERREURS ET CLOSE" ENDL
 								for (std::vector<User *>::iterator it = _usr_list.begin(); it != _usr_list.end(); it++)
 								{
 									// std::cerr << (*it)->get_fd() << " --- " << fds[fd_cursor].fd << std::endl;
@@ -474,18 +475,12 @@ int		Server::polling_loop()
 
 							//if (errno == EWOULDBLOCK)
 							//	PRERR "WOULD BLOCK" ENDL;
-							PRERR "\033[31mCurrent value of recv_ret\033[0m" << recv_ret ENDL
-							PRERR "\033[31mReceived this :" << std::endl;
-							PRERR "<<" << buffer << ">>\033[0m" ENDL;
-							//full_buffer.append(buffer);
-							//PRERR "\033[31m go running buffer\033[0m" ENDL;
-							//full_buffer.clear();
-							//run_buffer(fds[fd_cursor].fd, buffer);
-
-
-							//send(fds[fd_cursor].fd, "\r\n", sizeof(char)*2, 0);
-							// send(fds[fd_cursor].fd, buffer, sizeof(buffer), 0);
-							// Errors	
+							if (DEBUG_MODE)
+							{
+								PRERR "\033[31mCurrent value of recv_ret\033[0m" << recv_ret ENDL
+								PRERR "\033[31mReceived this :" << std::endl;
+								PRERR "<<" << buffer << ">>\033[0m" ENDL;	
+							}
 						}
 					} while (compilecommand(buffer, fd_cursor, fds[fd_cursor].fd));
 					this->fds[fd_cursor].revents = 0;
@@ -501,7 +496,8 @@ int		Server::polling_loop()
 		{
 			send(fds[fd_cursor].fd, "The server has closed the connection.\n", sizeof(char) * 38, 0);
 			close(fds[fd_cursor].fd);
-			PRERR "ERREURS ET CLOSE" ENDL
+			if (DEBUG_MODE)
+				PRERR "ERREURS ET CLOSE" ENDL
 			for (std::vector<User *>::iterator it = _usr_list.begin(); it != _usr_list.end(); it++)
 			{
 				// std::cerr << (*it)->get_fd() << " --- " << fds[fd_cursor].fd << std::endl;
@@ -566,17 +562,20 @@ int		Server::compilecommand(char *message, int fd, int realfd)
 			return (1);
 		}	
 	}
-	PRERR "Message size  " << this->_buffers[fd] ENDL;
+	if (DEBUG_MODE)
+		PRERR "Message current form  " << this->_buffers[fd] ENDL;
 	if (this->_buffers[fd].find(CRLF) != str::npos && this->_buffers[fd].find_last_of(CRLF) + sizeof(CRLF) >= this->_buffers[fd].size())
 	{
-		PRERR "Correct message, going for the parse" ENDL;
+		if (DEBUG_MODE)
+			PRERR "Correct message, going for the parse" ENDL;
 		run_buffer(realfd, this->_buffers[fd].c_str());
 		this->_buffers[fd].clear();
 		return (0);
 	}
 	else
 	{
-		PRERR "Message not ready yet" ENDL;
+		if (DEBUG_MODE)
+			PRERR "Message not ready yet" ENDL;
 		return (1);
 	}
 }

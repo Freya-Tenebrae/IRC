@@ -6,7 +6,7 @@
 /*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/19 13:08:45 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/05/19 13:44:17 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # define VERSION "0.3"
 # define CRLF "\r\n"
 # define MAX_USERS 5 // The server also counts as a user, minimum 1
-# define DEBUG_MODE 1 // If set to 1 activates remote close/restart of the server
+# define DEBUG_MODE 0 // If set to 1 activates remote close/restart of the server
 // These are a security risk as they bypass Oper
 // See Server.cpp 518
 
