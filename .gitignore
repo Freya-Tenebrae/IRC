@@ -1,3 +1,4 @@
-ft_irc
-a.out
 OBJS/*
+ft_irc
+bot
+.nfs*
