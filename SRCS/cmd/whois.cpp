@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/18 16:25:26 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/22 16:59:10 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,128 +108,142 @@ Reply Example:
 
 std::vector<Reply>	Server::whois(User *user, std::vector<std::string> args)
 {
-	int	nick = 0;
 	std::vector<Reply> reply;
-	(void)user;							// get rid of this to make it work
-	(void)args;							// get rid of this to make it work
-	if (args.size() == 1)
-	{
-		if (args[0].empty() == false)
-		{
-			for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
-			{
-				if ((*it_usr)->get_nickname().compare(args[0]))
-				{
-					reply.push_back(RPL_WHOISUSER);
-					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "is logged in as");
-					reply[reply.size()-1].add_arg(user->get_nickname(), "");	//client
-					reply[reply.size()-1].add_arg((*it_usr)->get_username(), "username");
-					reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "hostname");
-					reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "realname");
-				}
-				break ;
-			}
-		}
-		else
-			reply.push_back(ERR_NONICKNAMEGIVEN);
-	}
-	else if (args.size() == 2)
-	{
-		if (args[0].empty() == false && (args[0].compare(this->get_name()) || args[0] == args[1]))
-		{
-			for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
-			{
-				if ((*it_usr)->get_nickname().compare(args[0]))
-				{
-					reply.push_back(RPL_WHOISUSER);
-					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "is logged in as");
-					reply[reply.size()-1].add_arg((*it_usr)->get_username(), "username");
-					reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "hostname");
-					reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "realname");
-					if (user->check_if_mode_is_used('o') == true)
-					{
-						reply.push_back(RPL_WHOISCERTFP);
-						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
+	(void)args;
 
-						reply.push_back(RPL_WHOISREGNICK);
-						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-
-						reply.push_back(RPL_WHOISSERVER);
-						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-						reply[reply.size()-1].add_arg(this->get_name(), "server");
-						reply[reply.size()-1].add_arg(this->get_version(), "server info");
-
-						reply.push_back(RPL_WHOISOPERATOR);
-						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-
-						reply.push_back(RPL_WHOISCHANNELS);	// to se what is the prefix to add
-						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-						for (std::vector<Channel *>::const_iterator it_ch = _cha_list.begin(); it_ch != _cha_list.end(); it_ch++)
-						{
-							if ((*it_ch)->get_User(user->get_fd()) != NULL)
-								reply[reply.size()-1].add_arg((*it_ch)->get_name(), "");
-							// if (chan->check_if_complexe_mode_is_correct('o', (*it)->get_nickname()) == true)
-							// 	reply[reply.size() - 1].add_arg_alt("@", "prefix");
-							// else
-							// 	reply[reply.size() - 1].add_arg_alt("", "prefix");
-
-																							// 								#define RPL_ENDOFWHOIS Reply(318, "<client> <nick> :End of /WHOIS list\n")
-																							// #define RPL_WHOISCHANNELS Reply(319, "<client> <nick> :\n")
-						}
-						if (args[0][0] == '#')
-						{
-							args[0].erase(0, 1);
-							for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
-							{
-								if ((*it)->get_name().compare(args[0]))
-									reply[reply.size()-1].add_arg((*it)->get_name(), "channel");
-							}
-						}
-						else if (args[0] == args[1])
-						{
-							for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
-							{
-								const std::vector<User *> ch_usr_list_ref = (*it)->get_ch_usr_list();
-								for (std::vector<User *>::const_iterator it_usr = ch_usr_list_ref.begin(); it_usr != ch_usr_list_ref.end(); it_usr++)
-									if ((*it_usr)->get_nickname() == args[1])
-										reply[reply.size()-1].add_arg((*it)->get_name(), " ");
-							}
-						}
-					}
-				}
-				// these messages are not treated for now, need more informations to add or to test before more completion
-				//reply.push_back(RPL_WHOISSPECIAL);
-				//reply.push_back(RPL_WHOISACCOUNT); // see what is account
-				reply.push_back(RPL_WHOISACTUALLY);
-				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-				reply[reply.size()-1].add_arg((*it_usr)->get_username(), "");
-				reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "");
-				reply[reply.size()-1].add_arg((*it_usr)->get_hostaddr(), ""); // change to user's IP address
-				reply.push_back(RPL_WHOISHOST);
-				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-				reply.push_back(RPL_WHOISMODES);
-				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-				reply[reply.size()-1].add_arg((*it_usr)->get_usermode(), "usermodes");
-				reply.push_back(RPL_WHOISSECURE);
-				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-				reply.push_back(RPL_WHOISIDLE);
-				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-				//reply[reply.size()-1].add_arg((*it_usr)->get_deltaTimePing(), "idleTime"); //seconds idle to modify
-				//reply[reply.size()-1].add_arg((*it_usr)->get_lastTimePing(), "signon"); // have to replace by signon delta time
-				reply.push_back(RPL_AWAY);
-				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
-				reply[reply.size()-1].add_arg((*it_usr)->get_status_message(), "status");
-			}
-		}
-	}
+	if (user->get_status() == USR_STAT_BAN)
+		reply.push_back(ERR_YOUREBANNEDCREEP);
 	else
-		reply.push_back(ERR_NOSUCHSERVER);
-	reply.push_back(RPL_ENDOFWHOIS);
-	reply[reply.size()-1].add_arg(args[nick], "nickname");
-	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
 	{
-		it->add_user(user);
-		it->prep_to_send(1);
+		reply.push_back(ERR_UNKNOWNCOMMAND);
+		reply[0].add_user(user);
+		reply[0].add_arg("WHOIS", "command");
+		reply[0].prep_to_send(1);
 	}
 	return (reply);
 }
+
+// std::vector<Reply>	Server::whois(User *user, std::vector<std::string> args)
+// {
+// 	int	nick = 0;
+// 	std::vector<Reply> reply;
+
+// 	if (args.size() == 1)
+// 	{
+// 		if (args[0].empty() == false)
+// 		{
+// 			for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
+// 			{
+// 				if ((*it_usr)->get_nickname().compare(args[0]))
+// 				{
+// 					reply.push_back(RPL_WHOISUSER);
+// 					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "is logged in as");
+// 					reply[reply.size()-1].add_arg(user->get_nickname(), "nick");	//client
+// 					reply[reply.size()-1].add_arg((*it_usr)->get_username(), "username");
+// 					reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "hostname");
+// 					reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "realname");
+// 				}
+// 				break ;
+// 			}
+// 		}
+// 		else
+// 			reply.push_back(ERR_NONICKNAMEGIVEN);
+// 	}
+// 	else if (args.size() == 2)
+// 	{
+// 		if (args[0].empty() == false && (args[0].compare(this->get_name()) || args[0] == args[1]))
+// 		{
+// 			for (std::vector<User *>::iterator it_usr = _usr_list.begin(); it_usr != _usr_list.end(); it_usr++)
+// 			{
+// 				if ((*it_usr)->get_nickname().compare(args[0]))
+// 				{
+// 					reply.push_back(RPL_WHOISUSER);
+// 					reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 					reply[reply.size()-1].add_arg((*it_usr)->get_username(), "username");
+// 					reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "hostname");
+// 					reply[reply.size()-1].add_arg((*it_usr)->get_realname(), "realname");
+// 					if (user->check_if_mode_is_used('o') == true)
+// 					{
+// 						reply.push_back(RPL_WHOISCERTFP);
+// 						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+
+// 						reply.push_back(RPL_WHOISREGNICK);
+// 						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+
+// 						reply.push_back(RPL_WHOISSERVER);
+// 						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 						reply[reply.size()-1].add_arg(this->get_name(), "server");
+// 						reply[reply.size()-1].add_arg(this->get_version(), "server info");
+
+// 						reply.push_back(RPL_WHOISOPERATOR);
+// 						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nickname");
+
+// 						reply.push_back(RPL_WHOISCHANNELS);	// to se what is the prefix to add
+// 						reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 						for (std::vector<Channel *>::const_iterator it_ch = _cha_list.begin(); it_ch != _cha_list.end(); it_ch++)
+// 						{
+// 							if ((*it_ch)->get_User(user->get_fd()) != NULL)
+// 								reply[reply.size()-1].add_arg((*it_ch)->get_name(), "channel");
+// 							// if ((*it_ch)->check_if_complexe_mode_is_correct('o', (*it)->get_nickname()) == true)
+// 							// 	reply[reply.size() - 1].add_arg_alt("@", "prefix");
+// 							// else
+// 							// 	reply[reply.size() - 1].add_arg_alt("", "prefix");
+// 																							// #define RPL_WHOISCHANNELS Reply(319, "<client> <nick> :\n")
+// 						}
+// 						if (args[0][0] == '#')
+// 						{
+// 							args[0].erase(0, 1);
+// 							for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
+// 							{
+// 								if ((*it)->get_name().compare(args[0]))
+// 									reply[reply.size()-1].add_arg((*it)->get_name(), "channel");
+// 							}
+// 						}
+// 						else if (args[0] == args[1])
+// 						{
+// 							for (std::vector<Channel *>::iterator it = _cha_list.begin(); it != _cha_list.end(); it++)
+// 							{
+// 								const std::vector<User *> ch_usr_list_ref = (*it)->get_ch_usr_list();
+// 								for (std::vector<User *>::const_iterator it_usr = ch_usr_list_ref.begin(); it_usr != ch_usr_list_ref.end(); it_usr++)
+// 									if ((*it_usr)->get_nickname() == args[1])
+// 										reply[reply.size()-1].add_arg((*it)->get_name(), "nick");
+// 							}
+// 						}
+// 					}
+// 				}
+// 				// these messages are not treated for now, need more informations to add or to test before more completion
+// 				//reply.push_back(RPL_WHOISSPECIAL);
+// 				//reply.push_back(RPL_WHOISACCOUNT); // see what is account
+// 				reply.push_back(RPL_WHOISACTUALLY);
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_username(), "username");
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_hostname(), "hostname");
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_hostaddr(), "ip"); // change to user's IP address
+// 				reply.push_back(RPL_WHOISHOST);
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 				reply.push_back(RPL_WHOISMODES);
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_usermode(), "usermode");
+// 				reply.push_back(RPL_WHOISSECURE);
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 				reply.push_back(RPL_WHOISIDLE);
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 				reply[reply.size()-1].add_arg(SSTR((*it_usr)->get_deltaTimePing()), "secs"); //seconds idle to modify
+// 				reply[reply.size()-1].add_arg(SSTR((*it_usr)->get_lastTimePing()), "signon"); // have to replace by signon delta time
+// 				reply.push_back(RPL_AWAY);
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_nickname(), "nick");
+// 				reply[reply.size()-1].add_arg((*it_usr)->get_status_message(), "message");
+// 			}
+// 		}
+// 	}
+// 	else
+// 		reply.push_back(ERR_NOSUCHSERVER);
+// 	reply.push_back(RPL_ENDOFWHOIS);
+// 	reply[reply.size()-1].add_arg(args[nick], "nick");
+// 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+// 	{
+// 		it->add_user(user);
+// 		it->prep_to_send(1);
+// 	}
+// 	return (reply);
+// }

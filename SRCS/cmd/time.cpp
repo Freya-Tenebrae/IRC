@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:43:57 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/22 17:07:33 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,17 +31,34 @@ RPL_TIME (391)
 std::vector<Reply>	Server::time(User *user, std::vector<std::string> args)
 {
 	std::vector<Reply> reply;
-	int					target = 0;
+	(void)args;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
-	else if (user->get_connected() == false)
-		reply.push_back(ERR_NOTREGISTERED);
-	else if (args.empty() == true || args[target].compare(this->_name))
-		reply.push_back(RPL_TIME);
 	else
-		reply.push_back(ERR_NOSUCHSERVER);
-	reply[0].add_user(user);
-	reply[0].prep_to_send(1);
+	{
+		reply.push_back(ERR_UNKNOWNCOMMAND);
+		reply[0].add_user(user);
+		reply[0].add_arg("CAP", "command");
+		reply[0].prep_to_send(1);
+	}
 	return (reply);
 }
+
+// std::vector<Reply>	Server::time(User *user, std::vector<std::string> args)
+// {
+// 	std::vector<Reply> reply;
+// 	int					target = 0;
+
+// 	if (user->get_status() == USR_STAT_BAN)
+// 		reply.push_back(ERR_YOUREBANNEDCREEP);
+// 	else if (user->get_connected() == false)
+// 		reply.push_back(ERR_NOTREGISTERED);
+// 	else if (args.empty() == true || args[target].compare(this->_name))
+// 		reply.push_back(RPL_TIME);
+// 	else
+// 		reply.push_back(ERR_NOSUCHSERVER);
+// 	reply[0].add_user(user);
+// 	reply[0].prep_to_send(1);
+// 	return (reply);
+// }

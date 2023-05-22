@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 19:12:05 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/22 17:05:57 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,24 +45,41 @@ ERR_NOORIGIN (409)
 
 std::vector<Reply>	Server::ping(User *user, std::vector<std::string> args)
 {
-	std::vector<Reply>	reply;
-	int 				token = 0;
+	std::vector<Reply> reply;
+	(void)args;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
-	else if (user->get_connected() == false)
-		reply.push_back(ERR_NOTREGISTERED);
-	else if (args.empty() == true || args[token].compare("") == 0)	// NEED TO SEE HOW TO IDENTIFY THE NICKNAME IN ARGS
-		reply.push_back(ERR_NOORIGIN);
 	else
 	{
-		reply.push_back(RPL_PONG);
+		reply.push_back(ERR_UNKNOWNCOMMAND);
 		reply[0].add_user(user);
-		reply[0].add_arg(args[token], "tocken");
-		return (reply);
+		reply[0].add_arg("CAP", "command");
+		reply[0].prep_to_send(1);
 	}
-	reply[0].add_user(user);
-	reply[0].add_arg("PING", "command");
-	reply[0].prep_to_send(1);
 	return (reply);
 }
+
+// std::vector<Reply>	Server::ping(User *user, std::vector<std::string> args)
+// {
+// 	std::vector<Reply>	reply;
+// 	int 				token = 0;
+
+// 	if (user->get_status() == USR_STAT_BAN)
+// 		reply.push_back(ERR_YOUREBANNEDCREEP);
+// 	else if (user->get_connected() == false)
+// 		reply.push_back(ERR_NOTREGISTERED);
+// 	else if (args.empty() == true || args[token].compare("") == 0)	// NEED TO SEE HOW TO IDENTIFY THE NICKNAME IN ARGS
+// 		reply.push_back(ERR_NOORIGIN);
+// 	else
+// 	{
+// 		reply.push_back(RPL_PONG);
+// 		reply[0].add_user(user);
+// 		reply[0].add_arg(args[token], "tocken");
+// 		return (reply);
+// 	}
+// 	reply[0].add_user(user);
+// 	reply[0].add_arg("PING", "command");
+// 	reply[0].prep_to_send(1);
+// 	return (reply);
+// }

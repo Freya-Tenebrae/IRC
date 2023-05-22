@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/25 19:11:30 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/22 17:05:59 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,33 +30,50 @@ Numeric Replies:
 None
 */
 
-static bool token_match(User *user, std::string token)
-{
-	(void)token;
-	(void)user;
-	return (true);
-}
-
 std::vector<Reply>	Server::pong(User *user, std::vector<std::string> args)
 {
-	std::vector<Reply>	reply;
-	int 				token = 0;
+	std::vector<Reply> reply;
+	(void)args;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
-	else if (user->get_connected() == false)
-		reply.push_back(ERR_NOTREGISTERED);
-	else if (args.empty() == true || args[token].compare("") == 0)	// NEED TO SEE HOW TO IDENTIFY THE NICKNAME IN ARGS
-		reply.push_back(ERR_NOORIGIN);
-	else if (token_match(user, args[token]) == false) // check if token is the same
-		reply.push_back(ERR_TOKENMISMATCH);
 	else
 	{
-		// update ping/pong value on User.cpp // not used in this irc serv
-		reply.push_back(RPL_NONE);
+		reply.push_back(ERR_UNKNOWNCOMMAND);
+		reply[0].add_user(user);
+		reply[0].add_arg("CAP", "command");
+		reply[0].prep_to_send(1);
 	}
-	reply[0].add_user(user);
-	reply[0].add_arg("PONG", "");
-	reply[0].prep_to_send(1);
 	return (reply);
 }
+
+// static bool token_match(User *user, std::string token)
+// {
+// 	(void)token;
+// 	(void)user;
+// 	return (true);
+// }
+
+// std::vector<Reply>	Server::pong(User *user, std::vector<std::string> args)
+// {
+// 	std::vector<Reply>	reply;
+// 	int 				token = 0;
+
+// 	if (user->get_status() == USR_STAT_BAN)
+// 		reply.push_back(ERR_YOUREBANNEDCREEP);
+// 	else if (user->get_connected() == false)
+// 		reply.push_back(ERR_NOTREGISTERED);
+// 	else if (args.empty() == true || args[token].compare("") == 0)	// NEED TO SEE HOW TO IDENTIFY THE NICKNAME IN ARGS
+// 		reply.push_back(ERR_NOORIGIN);
+// 	else if (token_match(user, args[token]) == false) // check if token is the same
+// 		reply.push_back(ERR_TOKENMISMATCH);
+// 	else
+// 	{
+// 		// update ping/pong value on User.cpp // not used in this irc serv
+// 		reply.push_back(RPL_NONE);
+// 	}
+// 	reply[0].add_user(user);
+// 	reply[0].add_arg("PONG", "");
+// 	reply[0].prep_to_send(1);
+// 	return (reply);
+// }

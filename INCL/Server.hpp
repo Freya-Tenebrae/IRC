@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/19 13:44:17 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/05/22 17:00:15 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # define DEFAULT_TIMEOUT 5*60*1000 // Expressed in ms, minimum 500
 # define MAX_LINE_SIZE 210 // Minimum 50
 # define NEW_CONNECTION_MESSAGE "You have connected to FT_IRC\n"
-# define VERSION "0.3"
+# define VERSION "1.2"
 # define CRLF "\r\n"
 # define MAX_USERS 5 // The server also counts as a user, minimum 1
 # define DEBUG_MODE 0 // If set to 1 activates remote close/restart of the server

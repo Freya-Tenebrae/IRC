@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 17:32:30 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/18 17:21:44 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/22 17:21:39 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,15 @@ class Reply
 		void		prep_to_send(int mode = 0);
 
 };
+
+# define SSTR( x ) static_cast< std::ostringstream & >((std::ostringstream() << std::dec << x)).str()
+
+	// #define RPL_BANLIST Reply(367, "<client> <channel> <mask>\n")
+	// #define RPL_ENDOFBANLIST Reply(368, "<client> <channel> :End of channel ban list\n")
+	// #define RPL_EXCEPTLIST Reply(348, "<client> <channel> <mask>\n")
+	// #define RPL_ENDOFEXCEPTLIST Reply(349, "<client> <channel> :End of channel exception list\n")
+	// #define RPL_INVITELIST Reply(336, "<client> <channel> <mask>\n")
+	// #define RPL_ENDOFINVITELIST Reply(337, "<client> <channel> :End of /INVITE list\n")
 
 #define RPL_WELCOME Reply(001, "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]\n")
 #define RPL_YOURHOST Reply(002, "<client> :Your host is <servername>, running version <version>\n")
@@ -100,8 +109,8 @@ class Reply
 #define RPL_NOTOPIC Reply(331, "<client> <channel> :No topic is set\n")
 #define RPL_TOPIC Reply(332, "<client> <channel> :<topic>\n")
 #define RPL_TOPICWHOTIME Reply(333, "<client> <channel> <nick> <setat>\n")
-#define RPL_INVITELIST Reply(336, "<client> <channel>\n")
-#define RPL_ENDOFINVITELIST Reply(337, "<client> :End of /INVITE list\n")
+#define RPL_INVITELIST Reply(336, "<client> <channel> <mask>\n")
+#define RPL_ENDOFINVITELIST Reply(337, "<client> <channel> :End of /INVITE list\n")
 #define RPL_WHOISACTUALLY Reply(338, "<client> <nick> <username>@<hostname> <ip> :Is actually using host\n")
 #define RPL_INVITING Reply(341, "<client> <nick> <channel>\n")
 #define RPL_INVEXLIST Reply(346, "<client> <channel> <mask>\n")
@@ -115,7 +124,7 @@ class Reply
 #define RPL_LINKS Reply(364, "<client> * <server> :<hopcount> <server info>\n")
 #define RPL_ENDOFLINKS Reply(365, "<client> * :End of /LINKS list\n")
 #define RPL_ENDOFNAMES Reply(366, "<client> <channel> :End of /NAMES list\n")
-#define RPL_BANLIST Reply(367, "<client> <channel> <mask> [<who> <set-ts>]\n")
+#define RPL_BANLIST Reply(367, "<client> <channel> <mask>\n")
 #define RPL_ENDOFBANLIST Reply(368, "<client> <channel> :End of channel ban list\n")
 #define RPL_ENDOFWHOWAS Reply(369, "<client> <nick> :End of WHOWAS\n")
 #define RPL_INFO Reply(371, "<client> :<string>\n")
