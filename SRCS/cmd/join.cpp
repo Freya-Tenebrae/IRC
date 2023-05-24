@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/19 12:59:50 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/24 18:29:37 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,56 +112,64 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 	bool						is_creator = false;
 
 	Channel *chan = find_channel(channel_name);
-	if (chan == NULL)
+	if (channel_name.compare("") == 0 || (channel_name[0] != '@' && channel_name[0] != '#'))
 	{
-		chan = new Channel(channel_name);
-		_cha_list.push_back(chan);
-		is_creator = true;
+		reply.push_back(ERR_BADCHANMASK);
+		reply[reply.size() - 1].add_arg(channel_name, "channel");
 	}
-
-		// ERR_TOOMANYCHANNELS (405) // not use (maybe)
-	if (chan->check_if_complexe_mode_is_used('k') && chan->check_if_complexe_mode_is_correct('k', channel_key) == false)
-		reply.push_back(ERR_BADCHANNELKEY);
-	else if (chan->check_if_simple_mode_is_used('i') == true && chan->check_if_complexe_mode_is_correct('I', user->get_nickname()) == false)
-		reply.push_back(ERR_INVITEONLYCHAN);
-	else if (chan->get_number_max_user() != -1 && chan->get_number_act_user() >= chan->get_number_max_user())
-		reply.push_back(ERR_CHANNELISFULL);
-	else if (chan->check_if_complexe_mode_is_used('b') == true && chan->check_if_complexe_mode_is_correct('b', user->get_nickname()) == true && chan->check_if_complexe_mode_is_correct('e', user->get_nickname()) == false) // tmp ban on nickname
-		reply.push_back(ERR_BANNEDFROMCHAN);
 	else
 	{
-		chan->add_user(user);
-		if (is_creator == true)
-			chan->add_complex_channelmode('o', user->get_nickname());
-
-		const std::vector<User *> ch_usr_list_ref = chan->get_ch_usr_list();
-
-		args_to_topic_and_name.push_back(channel_name);
-		reply_topic = topic(user, args_to_topic_and_name);
-		reply_names = names(user, args_to_topic_and_name);
-
-		reply.push_back(MGS_JOIN);
-
-		to_send.push_back(MGS_JOIN);
-		to_send[0].add_user(user);
-		to_send[0].add_arg(chan->get_name(), "channel");
-		to_send[0].prep_to_send(1);
-
-		for (std::vector<User *>::const_iterator it = ch_usr_list_ref.begin(); it != ch_usr_list_ref.end(); it++)
+		if (chan == NULL)
 		{
-			if (*it != user)
-				send_message(*it, to_send[0].get_message());
+			chan = new Channel(channel_name);
+			_cha_list.push_back(chan);
+			is_creator = true;
 		}
 
+			// ERR_TOOMANYCHANNELS (405) // not use (maybe)
+		if (chan->check_if_complexe_mode_is_used('k') && chan->check_if_complexe_mode_is_correct('k', channel_key) == false)
+			reply.push_back(ERR_BADCHANNELKEY);
+		else if (chan->check_if_simple_mode_is_used('i') == true && chan->check_if_complexe_mode_is_correct('I', user->get_nickname()) == false)
+			reply.push_back(ERR_INVITEONLYCHAN);
+		else if (chan->get_number_max_user() != -1 && chan->get_number_act_user() >= chan->get_number_max_user())
+			reply.push_back(ERR_CHANNELISFULL);
+		else if (chan->check_if_complexe_mode_is_used('b') == true && chan->check_if_complexe_mode_is_correct('b', user->get_nickname()) == true && chan->check_if_complexe_mode_is_correct('e', user->get_nickname()) == false) // tmp ban on nickname
+			reply.push_back(ERR_BANNEDFROMCHAN);
+		else
+		{
+			chan->add_user(user);
+			if (is_creator == true)
+				chan->add_complex_channelmode('o', user->get_nickname());
+
+			const std::vector<User *> ch_usr_list_ref = chan->get_ch_usr_list();
+
+			args_to_topic_and_name.push_back(channel_name);
+			reply_topic = topic(user, args_to_topic_and_name);
+			reply_names = names(user, args_to_topic_and_name);
+
+			reply.push_back(MGS_JOIN);
+
+			to_send.push_back(MGS_JOIN);
+			to_send[0].add_user(user);
+			to_send[0].add_arg(chan->get_name(), "channel");
+			to_send[0].prep_to_send(1);
+
+			for (std::vector<User *>::const_iterator it = ch_usr_list_ref.begin(); it != ch_usr_list_ref.end(); it++)
+			{
+				if (*it != user)
+					send_message(*it, to_send[0].get_message());
+			}
+
+		}
+		for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+		{
+			it->add_user(user);
+			it->add_arg(chan->get_name(), "channel");
+			it->prep_to_send(1);
+		}
+		reply.insert(reply.end(), reply_topic.begin(), reply_topic.end());
+		reply.insert(reply.end(), reply_names.begin(), reply_names.end());
 	}
-	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
-	{
-		it->add_user(user);
-		it->add_arg(chan->get_name(), "channel");
-		it->prep_to_send(1);
-	}
-	reply.insert(reply.end(), reply_topic.begin(), reply_topic.end());
-	reply.insert(reply.end(), reply_names.begin(), reply_names.end());
 	return (reply);
 }
 

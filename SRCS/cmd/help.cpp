@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/28 15:44:28 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/24 18:12:09 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,32 +48,50 @@ RPL_HELPTXT (705)
 RPL_ENDOFHELP (706)
 */
 
-std::vector<Reply>	Server::help(User *user, std::vector<std::string> args)
+std::vector<Reply>	Server::help(User *user, std::vector<std::string> args) // do not use
 {
 	std::vector<Reply> reply;
+	(void)args;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
-	else if (user->get_connected() == false)
-		reply.push_back(ERR_NOTREGISTERED);
 	else
 	{
-		if (args.size() == 0)
-		{
-			reply.push_back(RPL_HELPSTART);
-			reply.push_back(RPL_ENDOFHELP);
-		}
-		else if (args.size() == 1)
-		{
-			reply.push_back(ERR_HELPNOTFOUND);
-		}
+		reply.push_back(ERR_UNKNOWNCOMMAND);
+		reply[0].add_user(user);
+		reply[0].add_arg("HELP", "command");
+		reply[0].prep_to_send(1);
 	}
-
-	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
-	{
-		it->add_user(user);
-		it->prep_to_send(1);
-	}
-	
 	return (reply);
 }
+
+
+// std::vector<Reply>	Server::help(User *user, std::vector<std::string> args)
+// {
+// 	std::vector<Reply> reply;
+
+// 	if (user->get_status() == USR_STAT_BAN)
+// 		reply.push_back(ERR_YOUREBANNEDCREEP);
+// 	else if (user->get_connected() == false)
+// 		reply.push_back(ERR_NOTREGISTERED);
+// 	else
+// 	{
+// 		if (args.size() == 0)
+// 		{
+// 			reply.push_back(RPL_HELPSTART);
+// 			reply.push_back(RPL_ENDOFHELP);
+// 		}
+// 		else if (args.size() == 1)
+// 		{
+// 			reply.push_back(ERR_HELPNOTFOUND);
+// 		}
+// 	}
+
+// 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+// 	{
+// 		it->add_user(user);
+// 		it->prep_to_send(1);
+// 	}
+	
+// 	return (reply);
+// }

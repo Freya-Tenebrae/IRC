@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/19 13:02:40 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/24 18:18:51 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,49 +70,68 @@ RPL_ENDOFSTATS (219)
 
 std::vector<Reply>	Server::stats(User *user, std::vector<std::string> args)
 {
-	(void)user;
-	std::vector<Reply>	reply;
+	std::vector<Reply> reply;
+	(void)args;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
-	else if (args.size() == 0)
-	{
-		reply.push_back(ERR_NEEDMOREPARAMS);
-		reply[reply.size() - 1].add_arg("STATS", "command");
-	}
-	else if (args.size() == 2 && args[1].compare(this->get_name()) == false)
-		reply.push_back(ERR_NOSUCHSERVER);
 	else
 	{
-		for (std::string::iterator it = args[0].begin(); it != args[0].end(); it++)
-		{
-			if (*it == 'c')
-				reply.push_back(RPL_STATSCLINE);
-			if (*it == 'h')
-				reply.push_back(RPL_STATSHLINE);
-			if (*it == 'i')
-				reply.push_back(RPL_STATSILINE);
-			if (*it == 'k')
-				reply.push_back(RPL_STATSKLINE);
-			if (*it == 'l')
-				reply.push_back(RPL_STATSLLINE);
-			if (*it == 'o')
-				reply.push_back(RPL_STATSOLINE);
-			if (*it == 'm')
-				reply.push_back(RPL_STATSLINKINFO);
-			if (*it == 'u')
-				reply.push_back(RPL_STATSUPTIME);
-			if (*it == 'y')
-				reply.push_back(RPL_STATSCOMMANDS);
-		}
-	}
-	reply.push_back(RPL_ENDOFSTATS);
-	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
-	{
-		it->add_user(user);
-		it->prep_to_send(1);
+		reply.push_back(ERR_UNKNOWNCOMMAND);
+		reply[0].add_user(user);
+		reply[0].add_arg("STATS", "command");
+		reply[0].prep_to_send(1);
 	}
 	return (reply);
 }
+
+// std::vector<Reply>	Server::stats(User *user, std::vector<std::string> args)
+// {
+// 	(void)user;
+// 	std::vector<Reply>	reply;
+
+// 	if (user->get_status() == USR_STAT_BAN)
+// 		reply.push_back(ERR_YOUREBANNEDCREEP);
+// 	else if (user->get_connected() == false)
+// 		reply.push_back(ERR_NOTREGISTERED);
+// 	else if (args.size() == 0)
+// 	{
+// 		reply.push_back(ERR_NEEDMOREPARAMS);
+// 		reply[reply.size() - 1].add_arg("STATS", "command");
+// 	}
+// 	else if (args.size() == 2 && args[1].compare(this->get_name()) == false)
+// 		reply.push_back(ERR_NOSUCHSERVER);
+// 	else
+// 	{
+// 		for (std::string::iterator it = args[0].begin(); it != args[0].end(); it++)
+// 		{
+// 			if (*it == 'c')
+// 				reply.push_back(RPL_STATSCLINE);
+// 			if (*it == 'h')
+// 				reply.push_back(RPL_STATSHLINE);
+// 			if (*it == 'i')
+// 				reply.push_back(RPL_STATSILINE);
+// 			if (*it == 'k')
+// 				reply.push_back(RPL_STATSKLINE);
+// 			if (*it == 'l')
+// 				reply.push_back(RPL_STATSLLINE);
+// 			if (*it == 'o')
+// 				reply.push_back(RPL_STATSOLINE);
+// 			if (*it == 'm')
+// 				reply.push_back(RPL_STATSLINKINFO);
+// 			if (*it == 'u')
+// 				reply.push_back(RPL_STATSUPTIME);
+// 			if (*it == 'y')
+// 				reply.push_back(RPL_STATSCOMMANDS);
+// 		}
+// 	}
+// 	reply.push_back(RPL_ENDOFSTATS);
+// 	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+// 	{
+// 		it->add_user(user);
+// 		it->prep_to_send(1);
+// 	}
+// 	return (reply);
+// }

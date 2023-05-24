@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/04/17 18:44:01 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/24 18:02:29 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,22 @@ std::vector<Reply>	Server::version(User *user, std::vector<std::string> args)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
-	else if (args.empty() != true && args[target].compare("") != 0 && _name.compare(args[target]) != 0)
-		reply.push_back(ERR_NOSUCHSERVER);
+	else if (args.empty() == true || args[target].compare("") == 0 || this->_name.compare(args[target]) == true)
+	{
+		reply.push_back(RPL_VERSION);
+		reply[reply.size()-1].add_arg(this->get_version(), "version");
+		reply[reply.size()-1].add_arg(this->get_name(), "server");
+		reply[reply.size()-1].add_arg(":neco_irc test server", "comments");
+	}
 	else
 	{
-		if (this->_name.compare(args[target]))
-		{
-			reply.push_back(RPL_VERSION);
-			reply.push_back(RPL_ISUPPORT);		//to see how to match the target's version
-		}
-		else if (user->get_username().compare(args[target]))	// to see with a correct client name
-			reply.push_back(RPL_ISUPPORT);
+		reply.push_back(ERR_NOSUCHSERVER);
+		reply[reply.size()-1].add_arg(args[target], "server name");
+	}
+	for (std::vector<Reply>::iterator it = reply.begin(); it != reply.end(); it++)
+	{
+		it->add_user(user);
+		it->prep_to_send(1);
 	}
 	return (reply);
 }

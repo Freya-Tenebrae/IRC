@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/28 15:44:32 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/24 18:10:49 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,22 +43,39 @@ RPL_ADMINLOC2 (258)
 RPL_ADMINEMAIL (259)
 */
 
-std::vector<Reply>	Server::admin(User *user, std::vector<std::string> args)
+std::vector<Reply>	Server::admin(User *user, std::vector<std::string> args) // do not use
 {
 	std::vector<Reply> reply;
-	
+	(void)args;
+
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
-	else if (user->get_connected() == false)
-		reply.push_back(ERR_NOTREGISTERED);
-	else if (args.empty() == true || (args.size() == 1 && args[0].compare(this->get_name())))
-	{
-		reply.push_back(RPL_ADMINME);
-		reply.push_back(RPL_ADMINLOC1);
-		reply.push_back(RPL_ADMINLOC2);
-		reply.push_back(RPL_ADMINEMAIL);
-	}
 	else
-		reply.push_back(ERR_NOSUCHSERVER);
+	{
+		reply.push_back(ERR_UNKNOWNCOMMAND);
+		reply[0].add_user(user);
+		reply[0].add_arg("ADMIN", "command");
+		reply[0].prep_to_send(1);
+	}
 	return (reply);
 }
+
+// std::vector<Reply>	Server::admin(User *user, std::vector<std::string> args)
+// {
+// 	std::vector<Reply> reply;
+	
+// 	if (user->get_status() == USR_STAT_BAN)
+// 		reply.push_back(ERR_YOUREBANNEDCREEP);
+// 	else if (user->get_connected() == false)
+// 		reply.push_back(ERR_NOTREGISTERED);
+// 	else if (args.empty() == true || (args.size() == 1 && args[0].compare(this->get_name())))
+// 	{
+// 		reply.push_back(RPL_ADMINME);
+// 		reply.push_back(RPL_ADMINLOC1);
+// 		reply.push_back(RPL_ADMINLOC2);
+// 		reply.push_back(RPL_ADMINEMAIL);
+// 	}
+// 	else
+// 		reply.push_back(ERR_NOSUCHSERVER);
+// 	return (reply);
+// }
