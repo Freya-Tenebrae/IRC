@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 19:46:40 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/22 17:00:15 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/24 16:26:40 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@
 # define DEFAULT_OPER_ID "admin"
 # define DEFAULT_OPER_PWD "admin"
 # define DEFAULT_TIMEOUT 5*60*1000 // Expressed in ms, minimum 500
-# define MAX_LINE_SIZE 210 // Minimum 50
+# define MAX_LINE_SIZE 210 // Minimum 1
 # define NEW_CONNECTION_MESSAGE "You have connected to FT_IRC\n"
 # define VERSION "1.2"
 # define CRLF "\r\n"
 # define MAX_USERS 5 // The server also counts as a user, minimum 1
-# define DEBUG_MODE 0 // If set to 1 activates remote close/restart of the server
+# define DEBUG_MODE 1 // If set to 1 activates remote close/restart of the server
 // These are a security risk as they bypass Oper
 // See Server.cpp 518
 

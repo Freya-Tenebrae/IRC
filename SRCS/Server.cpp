@@ -6,7 +6,7 @@
 /*   By: mmercore <mmercore@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 17:38:53 by mmercore          #+#    #+#             */
-/*   Updated: 2023/05/19 13:48:01 by mmercore         ###   ########.fr       */
+/*   Updated: 2023/05/24 16:05:58 by mmercore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ Server::Server(int port, str password, t_sock_conf sock_conf):_password(password
 	this->_modt.push_back("                    NECO_IRC                    ");
 	this->_info.push_back("ft_irs is an irc server designed for irssi client");
 	this->_info.push_back("it's actual version is 0.3 ans is developped by cmaginot, mmercore, and plam");
-	if (MAX_USERS < 1 || MAX_LINE_SIZE < 50 || DEFAULT_TIMEOUT < 500 )
+	if (MAX_USERS < 1 || MAX_LINE_SIZE < 1 || DEFAULT_TIMEOUT < 500 )
 	{
 		this->errval = bad_param;
 		return ;
@@ -317,7 +317,7 @@ int		Server::polling_loop()
 {
 	// return (0);
 	int pol_ret, fd_counter, fd_cursor, new_fd, recv_ret;
-	char buffer[MAX_LINE_SIZE];
+	char buffer[MAX_LINE_SIZE + 1]; // Taking into account the terminating char
 
 	fd_counter = 1;		// Attribut public: La classe a t'elle rencontre
 		// Un pb ?
@@ -416,10 +416,10 @@ int		Server::polling_loop()
 					std::string full_buffer = "";
 					do
 					{
-						for (int i = 0; i < MAX_LINE_SIZE; i++)
+						for (int i = 0; i < MAX_LINE_SIZE + 1; i++)
 							buffer[i] = 0;
 						// MSG_DONTWAIT for nonblock sim
-						recv_ret = recv(fds[fd_cursor].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
+						recv_ret = recv(fds[fd_cursor].fd, buffer, (MAX_LINE_SIZE) * sizeof(char), MSG_DONTWAIT);
 						if (recv_ret <= 0 || find_user(fds[fd_cursor].fd)->get_kicked() == 1 || this->errval != 0)
 						{
 							// erreurs & close
@@ -538,6 +538,10 @@ int		Server::polling_loop()
 
 int		Server::compilecommand(char *message, int fd, int realfd)
 {
+	if (DEBUG_MODE)
+	{
+		PRERR "We have got as argumets fd " << fd << " realfd " << realfd << ". And message: " << message ENDL
+	}
 	this->_buffers[fd].append(message);
 	if (DEBUG_MODE)
 	{
