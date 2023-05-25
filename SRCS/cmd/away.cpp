@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   away.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
+/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/03/28 16:57:22 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/05/25 14:57:28 by plam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,18 @@ std::vector<Reply>	Server::away(User *user, std::vector<std::string> args)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
 	else if (user->get_connected() == false)
 		reply.push_back(ERR_NOTREGISTERED);
-	else if (args.size() == 1 && args[0].empty() == false)
+	else if (args.size() == 0)
 	{
-		user->set_status_message(args[0]);
-		reply.push_back(RPL_NOWAWAY);
-	}
-	else
-	{
+		user->set_status(USR_STAT_REGISTERED);
 		user->set_status_message("");
 		reply.push_back(RPL_UNAWAY);
 	}
-
+	else if (args.size() >= 1 && args[0].empty() == false)
+	{
+		user->set_status(USR_STAT_AWAY);
+		user->set_status_message(args[0]);
+		reply.push_back(RPL_NOWAWAY);
+	}
 	reply[0].add_user(user);
 	reply[0].prep_to_send(1);
 	return (reply);
