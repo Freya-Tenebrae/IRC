@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/24 18:29:37 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/06/01 15:30:13 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,16 @@ Message Examples:
 
 size_t npos = -1;
 
+static bool user_is_on_channel(Channel *chan, User *user)
+{
+	for (std::vector<User *>::const_iterator it = chan->get_ch_usr_list().begin(); it != chan->get_ch_usr_list().end(); it++)
+	{
+		if (*it == user)
+			return (true);
+	}
+	return (false);
+}
+
 std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std::string channel_key)
 {
 	std::vector<Reply>			reply, to_send, reply_topic, reply_names;
@@ -135,6 +145,12 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 			reply.push_back(ERR_CHANNELISFULL);
 		else if (chan->check_if_complexe_mode_is_used('b') == true && chan->check_if_complexe_mode_is_correct('b', user->get_nickname()) == true && chan->check_if_complexe_mode_is_correct('e', user->get_nickname()) == false) // tmp ban on nickname
 			reply.push_back(ERR_BANNEDFROMCHAN);
+		else if (user_is_on_channel(chan, user) == true)
+		{
+			reply.push_back(ERR_USERONCHANNEL);
+			reply[reply.size() - 1].add_arg("JOIN", "nick");
+			reply[reply.size() - 1].add_arg(user->get_nickname(), "channel");
+		}
 		else
 		{
 			chan->add_user(user);
