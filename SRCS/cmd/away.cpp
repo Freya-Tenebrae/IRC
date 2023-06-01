@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   away.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: plam <plam@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/05/25 14:57:28 by plam             ###   ########.fr       */
+/*   Updated: 2023/06/01 16:01:41 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ RPL_NOWAWAY (306)
 
 std::vector<Reply>	Server::away(User *user, std::vector<std::string> args)
 {
-	std::vector<Reply> reply;
+	std::vector<Reply>	reply;
+	std::string			away_message;
 
 	if (user->get_status() == USR_STAT_BAN)
 		reply.push_back(ERR_YOUREBANNEDCREEP);
@@ -58,8 +59,15 @@ std::vector<Reply>	Server::away(User *user, std::vector<std::string> args)
 	}
 	else if (args.size() >= 1 && args[0].empty() == false)
 	{
+		for (std::vector<std::string>::iterator it = args.begin() + 1; it != args.end(); it++)
+		{
+			away_message.append(" ");
+			away_message.append(*it);
+		}
+		away_message.erase(0, 2);
+		
 		user->set_status(USR_STAT_AWAY);
-		user->set_status_message(args[0]);
+		user->set_status_message(away_message);
 		reply.push_back(RPL_NOWAWAY);
 	}
 	reply[0].add_user(user);

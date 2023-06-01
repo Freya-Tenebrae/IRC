@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/06/01 15:30:13 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/06/01 15:37:29 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ std::vector<Reply> Server::try_to_join(User *user, std::string channel_name, std
 	bool						is_creator = false;
 
 	Channel *chan = find_channel(channel_name);
-	if (channel_name.compare("") == 0 || (channel_name[0] != '@' && channel_name[0] != '#'))
+	if (channel_name.compare("") == 0 || (channel_name[0] != '@' && channel_name[0] != '#') || channel_name.length() <= 1)
 	{
 		reply.push_back(ERR_BADCHANMASK);
 		reply[reply.size() - 1].add_arg(channel_name, "channel");
@@ -204,6 +204,7 @@ std::vector<Reply> Server::join(User *user, std::vector<std::string> args)
 	{
 		reply.push_back(ERR_NEEDMOREPARAMS);
 		reply[reply.size() - 1].add_arg("JOIN", "command");
+		reply[reply.size() - 1].add_user(user);
 	}
 	else
 	{
