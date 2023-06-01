@@ -6,7 +6,7 @@
 /*   By: cmaginot <cmaginot@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 18:15:54 by cmaginot          #+#    #+#             */
-/*   Updated: 2023/06/01 16:01:41 by cmaginot         ###   ########.fr       */
+/*   Updated: 2023/06/01 16:07:38 by cmaginot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@ std::vector<Reply>	Server::away(User *user, std::vector<std::string> args)
 			away_message.append(" ");
 			away_message.append(*it);
 		}
-		away_message.erase(0, 2);
-		
+		away_message.erase(0, 1);
+
 		user->set_status(USR_STAT_AWAY);
 		user->set_status_message(away_message);
 		reply.push_back(RPL_NOWAWAY);
