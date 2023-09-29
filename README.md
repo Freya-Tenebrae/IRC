@@ -12,5 +12,8 @@ This Repositorie contains my solution to the project `ft_irc` of 42 (Paris).
 ## Cloning
 
 ```shell
-git clone https://github.com/Freya-Tenebrae/Inception.git
+git clone https://github.com/Freya-Tenebrae/ft_irc.git
 ```
+## Using
+
+coming soon
