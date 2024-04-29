@@ -1,19 +1,30 @@
 # ft_irc
 
-This Repositorie contains my solution to the project `ft_irc` of 42 (Paris).
+Ce repository contiens ma solution au projet `ft_irc` de 42.
 
-[![cmaginot's 42 stats](https://badge42.vercel.app/api/v2/cl1s5sord008509mlo7xr33zy/stats?cursusId=21&coalitionId=45)](https://github.com/JaeSeoKim/badge42)
+Il à été réaliser avec [Maximilien Mercorelli](https://github.com/mmercore) et [Pierre Marie Lam](https://github.com/Askeladd42)
 
-[![mmercore's 42 stats]()]
-[![plam's 42 stats]()]
+This repository contains my solution to the project `ft_irc` of 42.
 
-[![cmaginot's 42 ft_irc Score](https://badge42.vercel.app/api/v2/cl1s5sord008509mlo7xr33zy/project/2859537)](https://github.com/JaeSeoKim/badge42)
+It was made with [Maximilien Mercorelli](https://github.com/mmercore) and [Pierre Marie Lam](https://github.com/Askeladd42)
 
-## Cloning
+## Description 
+
+Ce projet a pour but de reproduire un serveur IRC (Internet Relay Chat) compatible avec un client de notre choix (IRSSI)
+
+This project aims to create an IRC server (Internet Relay Chat) compatible with a client of our choice (IRSSI)
+
+## Using ft_irc
+
+### Cloning
 
 ```shell
 git clone https://github.com/Freya-Tenebrae/ft_irc.git
 ```
-## Using
 
-coming soon
+### Using
+
+```
+./ft_irc <port> <password>
+# for example `./ft_irc 32001 Pass`
+```
